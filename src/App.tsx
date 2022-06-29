@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
+import { Header } from './components';
 import themes from './themes/_list';
 
 const GlobalStyle = createGlobalStyle`
@@ -42,7 +43,9 @@ function App() {
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <StyledApp>
-        <Content />
+        <Content>
+          <Header />
+        </Content>
       </StyledApp>
     </ThemeProvider>
   );
