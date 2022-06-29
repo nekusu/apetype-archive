@@ -1,4 +1,6 @@
-import styled, { createGlobalStyle } from 'styled-components';
+import { useEffect, useState } from 'react';
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
+import themes from './themes/_list';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -16,6 +18,7 @@ const StyledApp = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: ${p => p.theme.bg};
   transition: background-color 0.25s;
 `;
 
@@ -26,13 +29,22 @@ const Content = styled.div`
 `;
 
 function App() {
+  const [theme, setTheme] = useState({});
+
+  useEffect(() => {
+    (async () => {
+      const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+      setTheme((await import(`./themes/${randomTheme.name}.ts`)).default);
+    })();
+  }, []);
+
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <GlobalStyle />
       <StyledApp>
         <Content />
       </StyledApp>
-    </>
+    </ThemeProvider>
   );
 }
 
