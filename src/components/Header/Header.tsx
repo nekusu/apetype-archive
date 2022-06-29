@@ -15,6 +15,7 @@ function Header() {
   return (
     <Styled.Header>
       <Styled.Logo onClick={() => navigate('/')}>
+        <Styled.Icon />
         <Styled.Text>
           <Styled.TopText>ape see</Styled.TopText>
           apetype

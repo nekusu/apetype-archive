@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { ReactComponent as IconSvg } from '../../images/icon.svg';
 
 const Header = styled.header`
   width: 100%;
@@ -11,8 +12,17 @@ const Header = styled.header`
 const Logo = styled.div`
   width: fit-content;
   display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: 'Lexend Deca';
   cursor: pointer;
+`;
+
+const Icon = styled(IconSvg)`
+  height: 25px;
+  width: 35px;
+  stroke: ${p => p.theme.main};
+  transition: stroke 0.25s;
 `;
 
 const Text = styled.div`
@@ -25,7 +35,7 @@ const Text = styled.div`
 
 const TopText = styled.div`
   position: absolute;
-  top: -2px;
+  top: -1px;
   left: 12px;
   font-size: 10px;
   color: ${p => p.theme.sub};
@@ -45,6 +55,7 @@ const Menu = styled.div`
 const Styled = {
   Header,
   Logo,
+  Icon,
   Text,
   TopText,
   Menu,
