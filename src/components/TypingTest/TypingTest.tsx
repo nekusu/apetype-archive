@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RiCursorFill } from 'react-icons/ri';
-import { Loading } from '../index';
+import { Loading } from '../ui';
 import languages from '../../languages/_list';
 import Styled from './TypingTest.styles';
 
