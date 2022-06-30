@@ -1,11 +1,11 @@
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface Props {
   active?: boolean;
 }
 
-const Button = styled(motion.button).attrs((props) => ({
+const Button = styled(m.button).attrs((props) => ({
   type: props.type || 'button',
 })) <Props>`
   padding: 8px;

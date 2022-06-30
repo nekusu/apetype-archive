@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import styled from 'styled-components';
 
 const TypingTest = styled.div`
@@ -16,7 +16,7 @@ const Input = styled.input`
   opacity: 0;
 `;
 
-const OutOfFocus = styled(motion.div).attrs(() => ({
+const OutOfFocus = styled(m.div).attrs(() => ({
   initial: { opacity: 0 },
   animate: { opacity: 1 },
 }))`
@@ -44,7 +44,7 @@ const Wrapper = styled.div<{ $blurred: boolean; }>`
   transition: opacity 0.4s, filter 0.4s;
 `;
 
-const Caret = styled(motion.div).attrs(() => ({
+const Caret = styled(m.div).attrs(() => ({
   transition: {
     opacity: { repeat: Infinity, duration: 1 },
     top: { ease: 'linear', duration: 0.075 },
@@ -59,7 +59,7 @@ const Caret = styled(motion.div).attrs(() => ({
   background-color: ${p => p.theme.caret};
 `;
 
-const Words = styled(motion.div).attrs(() => ({
+const Words = styled(m.div).attrs(() => ({
   initial: { opacity: 0 },
   animate: { opacity: 1 },
 }))`

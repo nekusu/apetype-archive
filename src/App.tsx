@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import { AnimatePresence, MotionConfig } from 'framer-motion';
+import { AnimatePresence, domAnimation, LazyMotion, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from 'styled-components';
 import { Header } from './components';
 import { Home } from './pages';
@@ -20,19 +20,21 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <MotionConfig transition={{ opacity: { duration: 0.25 } }}>
-        <GlobalStyle />
-        <Styled.App>
-          <Styled.Content>
-            <Header />
-            <AnimatePresence exitBeforeEnter>
-              <Routes location={location} key={location.pathname}>
-                <Route path="/" element={<Home />} />
-              </Routes>
-            </AnimatePresence>
-          </Styled.Content>
-        </Styled.App>
-      </MotionConfig>
+      <LazyMotion features={domAnimation}>
+        <MotionConfig transition={{ opacity: { duration: 0.25 } }}>
+          <GlobalStyle />
+          <Styled.App>
+            <Styled.Content>
+              <Header />
+              <AnimatePresence exitBeforeEnter>
+                <Routes location={location} key={location.pathname}>
+                  <Route path="/" element={<Home />} />
+                </Routes>
+              </AnimatePresence>
+            </Styled.Content>
+          </Styled.App>
+        </MotionConfig>
+      </LazyMotion>
     </ThemeProvider>
   );
 }
