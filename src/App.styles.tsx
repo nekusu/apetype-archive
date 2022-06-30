@@ -12,7 +12,6 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const App = styled.div`
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,9 +20,13 @@ const App = styled.div`
 `;
 
 const Content = styled.div`
+  min-height: 100vh;
   width: 100%;
   max-width: 1000px;
   padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const Styled = {
