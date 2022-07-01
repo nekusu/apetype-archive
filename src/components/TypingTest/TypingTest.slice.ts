@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface State {
   words: ApeTypes.Word[];
+  isRunning: boolean;
   isTyping: boolean;
 }
 
@@ -14,6 +15,7 @@ const slice = createSlice({
   name: 'typingTest',
   initialState: {
     words: [],
+    isRunning: false,
     isTyping: false,
   } as State,
   reducers: {
@@ -55,11 +57,14 @@ const slice = createSlice({
         letters,
       };
     },
+    setIsRunning: (state, action: PayloadAction<boolean>) => {
+      state.isRunning = action.payload;
+    },
     setIsTyping: (state, action: PayloadAction<boolean>) => {
       state.isTyping = action.payload;
     },
   },
 });
 
-export const { setWords, updateWord, setIsTyping } = slice.actions;
+export const { setWords, updateWord, setIsRunning, setIsTyping } = slice.actions;
 export default slice.reducer;

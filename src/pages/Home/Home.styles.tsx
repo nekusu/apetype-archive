@@ -7,7 +7,9 @@ const Home = styled(m.div).attrs(() => ({
   exit: { opacity: 0 },
 }))`
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
   flex: 1;
 `;
 

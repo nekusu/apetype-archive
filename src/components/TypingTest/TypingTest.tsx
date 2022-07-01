@@ -3,7 +3,7 @@ import { RiCursorFill } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { Loading } from '../ui';
 import languages from '../../languages/_list';
-import { setWords, updateWord, setIsTyping } from './TypingTest.slice';
+import { setWords, updateWord, setIsRunning, setIsTyping } from './TypingTest.slice';
 import Styled from './TypingTest.styles';
 
 function TypingTest() {
@@ -33,6 +33,7 @@ function TypingTest() {
     const { value } = e.target;
     const typed = [...value.trim()];
 
+    dispatch(setIsRunning(true));
     dispatch(setIsTyping(true));
     clearTimeout(typingTimeout.current);
     typingTimeout.current = setTimeout(() => dispatch(setIsTyping(false)), 1000);
@@ -65,6 +66,10 @@ function TypingTest() {
       const { words } = await reponse.json();
       dispatch(setWords(words));
     })();
+    return () => {
+      window.removeEventListener('keypress', focusWords);
+      dispatch(setIsRunning(false));
+    };
   }, [dispatch]);
   useEffect(() => {
     const top = currentWord.current?.offsetTop || 2;
