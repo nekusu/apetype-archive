@@ -1,7 +1,12 @@
 import { m } from 'framer-motion';
 import styled from 'styled-components';
 
-const TypingTest = styled.div`
+const TypingTest = styled(m.div).attrs(() => ({
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+}))`
+  height: 116px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -34,7 +39,6 @@ const OutOfFocus = styled(m.div).attrs(() => ({
 `;
 
 const Wrapper = styled.div<{ $blurred: boolean; }>`
-  height: 116px;
   padding: 4px 2px;
   position: relative;
   opacity: ${p => p.$blurred ? '0.4' : '1'} !important;
@@ -62,6 +66,7 @@ const Caret = styled(m.div).attrs(() => ({
 const Words = styled(m.div).attrs(() => ({
   initial: { opacity: 0 },
   animate: { opacity: 1 },
+  exit: { opacity: 0 },
 }))`
   position: relative;
   display: flex;

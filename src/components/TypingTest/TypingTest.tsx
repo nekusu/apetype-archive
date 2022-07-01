@@ -1,16 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, useIsPresent } from 'framer-motion';
 import { RiCursorFill } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { Loading } from '../ui';
 import languages from '../../languages/_list';
 import { setWords, updateWord, setIsRunning, setIsTyping } from './TypingTest.slice';
 import Styled from './TypingTest.styles';
+import shuffleArray from '../../utils/shuffleArray';
 
 function TypingTest() {
+  const isPresent = useIsPresent();
   const dispatch = useAppDispatch();
   const { words, isTyping } = useAppSelector(({ typingTest }) => typingTest);
   const [wordIndex, setWordIndex] = useState(0);
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(true);
   const [inputValue, setInputValue] = useState(' ');
   const [caretPosition, setCaretPosition] = useState({ top: 0, left: 0 });
   const input = useRef<HTMLInputElement>(null);
@@ -59,18 +62,19 @@ function TypingTest() {
 
   useEffect(() => {
     window.addEventListener('keypress', focusWords);
-    focusWords();
+    input.current?.focus();
     (async () => {
-      const [defaultLanguage] = languages;
-      const reponse = await fetch(languageURL(defaultLanguage));
-      const { words } = await reponse.json();
-      dispatch(setWords(words));
+      const words = await getWords();
+      dispatch(setWords(shuffleArray(words)));
     })();
-    return () => {
+  }, [dispatch]);
+  useEffect(() => {
+    if (!isPresent) {
       window.removeEventListener('keypress', focusWords);
       dispatch(setIsRunning(false));
-    };
-  }, [dispatch]);
+      dispatch(setWords([]));
+    }
+  }, [dispatch, isPresent]);
   useEffect(() => {
     const top = currentWord.current?.offsetTop || 2;
     const left = currentLetter.current
@@ -91,47 +95,50 @@ function TypingTest() {
         onChange={handleInput}
         onBlur={blurWords}
       />
-      {words.length
-        ? <Styled.Wrapper
-          ref={wordsWrapper}
-          onClick={focusWords}
-          $blurred={!isFocused}
-        >
-          {isFocused && (
-            <Styled.Caret
-              animate={{
-                opacity: [1, isTyping ? 1 : 0, 1],
-                top: caretPosition.top,
-                left: caretPosition.left,
-              }}
-            />
-          )}
-          <Styled.Words>
-            {words.map(({ original, typed, isCorrect, letters }, index) => (
-              <Styled.Word
-                ref={wordIndex === index ? currentWord : null}
-                key={original}
-                $error={wordIndex > index && !isCorrect}
-              >
-                {letters.map((letter, i) => (
-                  <Styled.Letter
-                    ref={wordIndex === index &&
-                      ((typed?.length || 0) - 1) === i
-                      ? currentLetter
-                      : null}
-                    key={i}
-                    $status={letter.status}
-                  >
-                    {letter.typed || letter.original}
-                  </Styled.Letter>
-                ))}
-              </Styled.Word>
-            ))}
-          </Styled.Words>
-        </Styled.Wrapper>
-        : <Loading />
-      }
-      {!isFocused && (
+      <AnimatePresence exitBeforeEnter>
+        {words.length
+          ? <Styled.Wrapper
+            key="words-wrapper"
+            ref={wordsWrapper}
+            onClick={focusWords}
+            $blurred={!isFocused}
+          >
+            {isFocused && (
+              <Styled.Caret
+                animate={{
+                  opacity: [1, isTyping ? 1 : 0, 1],
+                  top: caretPosition.top,
+                  left: caretPosition.left,
+                }}
+              />
+            )}
+            <Styled.Words>
+              {words.map(({ original, typed, isCorrect, letters }, index) => (
+                <Styled.Word
+                  ref={wordIndex === index ? currentWord : null}
+                  key={original}
+                  $error={wordIndex > index && !isCorrect}
+                >
+                  {letters.map((letter, i) => (
+                    <Styled.Letter
+                      ref={wordIndex === index &&
+                        ((typed?.length || 0) - 1) === i
+                        ? currentLetter
+                        : null}
+                      key={i}
+                      $status={letter.status}
+                    >
+                      {letter.typed || letter.original}
+                    </Styled.Letter>
+                  ))}
+                </Styled.Word>
+              ))}
+            </Styled.Words>
+          </Styled.Wrapper>
+          : <Loading />
+        }
+      </AnimatePresence>
+      {!!words.length && !isFocused && (
         <Styled.OutOfFocus>
           <RiCursorFill />
           Click or press any key to focus
@@ -142,5 +149,11 @@ function TypingTest() {
 }
 
 const languageURL = (lang: string) => `https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/${lang}.json`;
+const getWords = async () => {
+  const [defaultLanguage] = languages;
+  const reponse = await fetch(languageURL(defaultLanguage));
+  const { words } = await reponse.json();
+  return words;
+};
 
 export default TypingTest;

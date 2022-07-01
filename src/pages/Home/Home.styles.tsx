@@ -6,6 +6,7 @@ const Home = styled(m.div).attrs(() => ({
   animate: { opacity: 1 },
   exit: { opacity: 0 },
 }))`
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
