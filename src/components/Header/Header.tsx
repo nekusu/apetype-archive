@@ -7,13 +7,18 @@ import {
   RiSettingsFill,
   RiLoginCircleFill,
 } from 'react-icons/ri';
-import { useAppSelector } from '../../app/hooks';
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import { setMode, setTime } from '../../app/config.slice';
 import { Button } from '../ui';
 import Styled from './Header.styles';
 
 function Header() {
+  const dispatch = useAppDispatch();
+  const { mode, time } = useAppSelector(({ config }) => config);
   const { isTyping } = useAppSelector(({ typingTest }) => typingTest);
   const navigate = useNavigate();
+  const modes = ['time'];
+  const times = [15, 30, 60, 120];
 
   return (
     <Styled.Header>
@@ -28,7 +33,7 @@ function Header() {
       </Styled.Logo>
       <AnimatePresence>
         {!isTyping && (
-          <Styled.Menu>
+          <Styled.Menu key="menu">
             <Button text title="Home" navigate="/">
               <RiKeyboardBoxFill />
             </Button>
@@ -45,6 +50,34 @@ function Header() {
               <RiLoginCircleFill />
             </Button>
           </Styled.Menu>
+        )}
+        {!isTyping && (
+          <Styled.Config key="config">
+            <Styled.ConfigGroup>
+              {modes.map((m) => (
+                <Button
+                  onClick={() => dispatch(setMode(m as ApeTypes.Config['mode']))}
+                  key={m}
+                  text
+                  active={mode === m}
+                >
+                  {m}
+                </Button>
+              ))}
+            </Styled.ConfigGroup>
+            <Styled.ConfigGroup>
+              {times.map((t) => (
+                <Button
+                  onClick={() => dispatch(setTime(t as ApeTypes.Config['time']))}
+                  key={t}
+                  text
+                  active={time === t}
+                >
+                  {t}
+                </Button>
+              ))}
+            </Styled.ConfigGroup>
+          </Styled.Config>
         )}
       </AnimatePresence>
     </Styled.Header>

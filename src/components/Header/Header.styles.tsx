@@ -61,6 +61,28 @@ const Menu = styled(m.div).attrs(() => ({
   }
 `;
 
+const Config = styled(m.div).attrs(() => ({
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+}))`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1px;
+`;
+
+const ConfigGroup = styled.div`
+  display: flex;
+  gap: 5px;
+
+  button {
+    padding: 0;
+    font-size: 11px;
+  }
+`;
+
 const Styled = {
   Header,
   Logo,
@@ -68,6 +90,8 @@ const Styled = {
   Text,
   TopText,
   Menu,
+  Config,
+  ConfigGroup,
 };
 
 export default Styled;

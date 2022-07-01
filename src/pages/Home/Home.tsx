@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
-import { useAppDispatch } from '../../app/hooks';
+import { AnimatePresence } from 'framer-motion';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { setWords } from '../../components/TypingTest/TypingTest.slice';
 import { TestStats, TypingTest } from '../../components';
 import Styled from './Home.styles';
 
 function Home() {
   const dispatch = useAppDispatch();
+  const { mode, time } = useAppSelector(({ config }) => config);
 
   useEffect(() => {
     return () => {
@@ -16,7 +18,9 @@ function Home() {
   return (
     <Styled.Home>
       <TestStats />
-      <TypingTest />
+      <AnimatePresence exitBeforeEnter>
+        <TypingTest key={`${mode}-${time}`} />
+      </AnimatePresence>
     </Styled.Home>
   );
 }

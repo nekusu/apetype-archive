@@ -10,14 +10,17 @@ const slice = createSlice({
     seconds: 0,
   } as State,
   reducers: {
-    setTimer: (state, action: PayloadAction<number | undefined>) => {
-      state.seconds = action.payload || 0;
+    setTimer: (state, action: PayloadAction<number>) => {
+      state.seconds = action.payload;
     },
-    addSecond: (state) => {
+    incrementTimer: (state) => {
       state.seconds += 1;
+    },
+    decrementTimer: (state) => {
+      state.seconds -= 1;
     },
   },
 });
 
-export const { setTimer, addSecond } = slice.actions;
+export const { setTimer, incrementTimer, decrementTimer } = slice.actions;
 export default slice.reducer;
