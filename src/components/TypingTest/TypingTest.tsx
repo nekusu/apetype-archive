@@ -4,25 +4,12 @@ import { Loading } from '../ui';
 import languages from '../../languages/_list';
 import Styled from './TypingTest.styles';
 
-interface Word {
-  original: string;
-  typed?: string;
-  isCorrect: boolean;
-  letters: Letter[];
-}
-
-interface Letter {
-  original: string;
-  typed?: string;
-  status?: 'correct' | 'incorrect' | 'extra' | 'missed';
-}
-
 const languageURL = (lang: string) => `https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/${lang}.json`;
 
-function updateWord(word: Word, typed: string[]) {
+function updateWord(word: ApeTypes.Word, typed: string[]) {
   const typedWord = typed.join('');
   let letters = [...word.letters];
-  [...word.original].forEach((_letter: string, i: number) => {
+  [...word.original].forEach((_, i) => {
     letters[i].typed = typed[i];
     if (!typed[i]) {
       letters[i].status = 'missed';
@@ -38,7 +25,7 @@ function updateWord(word: Word, typed: string[]) {
       original: '',
       typed: letter,
       status: 'extra',
-    }) as Letter);
+    }) as ApeTypes.Letter);
     letters.push(...extraLetters);
   }
   return {
@@ -50,7 +37,7 @@ function updateWord(word: Word, typed: string[]) {
 }
 
 function TypingTest() {
-  const [words, setWords] = useState<Word[]>([]);
+  const [words, setWords] = useState<ApeTypes.Word[]>([]);
   const [wordIndex, setWordIndex] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
