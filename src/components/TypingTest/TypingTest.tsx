@@ -1,43 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RiCursorFill } from 'react-icons/ri';
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { Loading } from '../ui';
 import languages from '../../languages/_list';
+import { setWords, updateWord } from './TypingTest.slice';
 import Styled from './TypingTest.styles';
 
-const languageURL = (lang: string) => `https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/${lang}.json`;
-
-function updateWord(word: ApeTypes.Word, typed: string[]) {
-  const typedWord = typed.join('');
-  let letters = [...word.letters];
-  [...word.original].forEach((_, i) => {
-    letters[i].typed = typed[i];
-    if (!typed[i]) {
-      letters[i].status = 'missed';
-    } else if (typed[i] !== letters[i].original) {
-      letters[i].status = 'incorrect';
-    } else {
-      letters[i].status = 'correct';
-    }
-  });
-  letters = letters.filter((letter) => letter.status !== 'extra');
-  if (typed.length > word.original.length) {
-    const extraLetters = typed.slice(word.original.length).map((letter) => ({
-      original: '',
-      typed: letter,
-      status: 'extra',
-    }) as ApeTypes.Letter);
-    letters.push(...extraLetters);
-  }
-  return {
-    original: word.original,
-    typed: typedWord,
-    isCorrect: word.original === typedWord,
-    letters,
-  };
-}
-
 function TypingTest() {
-  const [words, setWords] = useState<ApeTypes.Word[]>([]);
+  const words = useAppSelector(({ typingTest }) => typingTest.words);
+  const dispatch = useAppDispatch();
   const [wordIndex, setWordIndex] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -66,12 +37,7 @@ function TypingTest() {
     setIsTyping(true);
     clearTimeout(typingTimeout.current);
     typingTimeout.current = setTimeout(() => setIsTyping(false), 1000);
-    setWords((words) => {
-      const newWords = [...words];
-      const word = newWords[wordIndex];
-      newWords[wordIndex] = updateWord(word, typed);
-      return newWords;
-    });
+    dispatch(updateWord({ wordIndex, typed }));
     if (!value) {
       if (wordIndex > 0) {
         const previousWord = words[wordIndex - 1].letters
@@ -98,16 +64,9 @@ function TypingTest() {
       const [defaultLanguage] = languages;
       const reponse = await fetch(languageURL(defaultLanguage));
       const { words } = await reponse.json();
-      setWords(words.map((word: string) => {
-        const letters = [...word].map((letter) => ({ original: letter }));
-        return {
-          original: word,
-          isCorrect: false,
-          letters,
-        };
-      }));
+      dispatch(setWords(words));
     })();
-  }, []);
+  }, [dispatch]);
   useEffect(() => {
     const top = currentWord.current?.offsetTop || 2;
     const left = currentLetter.current
@@ -177,5 +136,7 @@ function TypingTest() {
     </Styled.TypingTest>
   );
 }
+
+const languageURL = (lang: string) => `https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/${lang}.json`;
 
 export default TypingTest;
