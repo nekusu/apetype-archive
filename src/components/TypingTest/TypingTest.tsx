@@ -3,15 +3,14 @@ import { RiCursorFill } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { Loading } from '../ui';
 import languages from '../../languages/_list';
-import { setWords, updateWord } from './TypingTest.slice';
+import { setWords, updateWord, setIsTyping } from './TypingTest.slice';
 import Styled from './TypingTest.styles';
 
 function TypingTest() {
-  const words = useAppSelector(({ typingTest }) => typingTest.words);
   const dispatch = useAppDispatch();
+  const { words, isTyping } = useAppSelector(({ typingTest }) => typingTest);
   const [wordIndex, setWordIndex] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState(' ');
   const [caretPosition, setCaretPosition] = useState({ top: 0, left: 0 });
   const input = useRef<HTMLInputElement>(null);
@@ -34,9 +33,9 @@ function TypingTest() {
     const { value } = e.target;
     const typed = [...value.trim()];
 
-    setIsTyping(true);
+    dispatch(setIsTyping(true));
     clearTimeout(typingTimeout.current);
-    typingTimeout.current = setTimeout(() => setIsTyping(false), 1000);
+    typingTimeout.current = setTimeout(() => dispatch(setIsTyping(false)), 1000);
     dispatch(updateWord({ wordIndex, typed }));
     if (!value) {
       if (wordIndex > 0) {
