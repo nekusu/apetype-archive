@@ -1,4 +1,4 @@
-const themes = [
+const themes: ApeTypes.Theme[] = [
   {
     name: '8008',
     mode: 'dark',
