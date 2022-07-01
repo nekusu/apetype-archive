@@ -1,4 +1,9 @@
 declare namespace ApeTypes {
+  interface Config {
+    mode: 'time';
+    time: 15 | 30 | 60 | 120;
+  }
+
   interface Letter {
     original: string;
     typed?: string;
