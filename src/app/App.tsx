@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { Provider } from 'react-redux';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, domAnimation, LazyMotion, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from 'styled-components';
 import { Header } from '../components';
 import { Home } from '../pages';
 import themes from '../themes/_list';
+import store from './store';
 import Styled, { GlobalStyle } from './App.styles';
 
 function App() {
@@ -19,23 +21,25 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <LazyMotion features={domAnimation}>
-        <MotionConfig transition={{ opacity: { duration: 0.25 } }}>
-          <GlobalStyle />
-          <Styled.App>
-            <Styled.Content>
-              <Header />
-              <AnimatePresence exitBeforeEnter>
-                <Routes location={location} key={location.pathname}>
-                  <Route path="/" element={<Home />} />
-                </Routes>
-              </AnimatePresence>
-            </Styled.Content>
-          </Styled.App>
-        </MotionConfig>
-      </LazyMotion>
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <LazyMotion features={domAnimation}>
+          <MotionConfig transition={{ opacity: { duration: 0.25 } }}>
+            <GlobalStyle />
+            <Styled.App>
+              <Styled.Content>
+                <Header />
+                <AnimatePresence exitBeforeEnter>
+                  <Routes location={location} key={location.pathname}>
+                    <Route path="/" element={<Home />} />
+                  </Routes>
+                </AnimatePresence>
+              </Styled.Content>
+            </Styled.App>
+          </MotionConfig>
+        </LazyMotion>
+      </ThemeProvider>
+    </Provider>
   );
 }
 
