@@ -1,13 +1,9 @@
 import styled from 'styled-components';
 import { m } from 'framer-motion';
 
-interface Props {
-  active?: boolean;
-}
-
 const Button = styled(m.button).attrs((props) => ({
   type: props.type || 'button',
-})) <Props>`
+})) <{ $active?: boolean; }>`
   padding: 8px;
   display: flex;
   align-items: center;
@@ -15,8 +11,8 @@ const Button = styled(m.button).attrs((props) => ({
   gap: 6px;
   font-family: inherit;
   font-size: 16px;
-  background: ${p => p.active ? p.theme.main : p.theme.subAlt};
-  color: ${p => p.active ? p.theme.bg : p.theme.text};
+  background: ${p => p.$active ? p.theme.main : p.theme.subAlt};
+  color: ${p => p.$active ? p.theme.bg : p.theme.text};
   border-radius: 8px;
   user-select: none;
   cursor: pointer;
@@ -28,11 +24,11 @@ const Button = styled(m.button).attrs((props) => ({
   }
 `;
 
-const TextButton = styled(Button)`
+const TextButton = styled(Button) <{ $active?: boolean; }>`
   && {
     background: transparent;
   }
-  color: ${p => p.theme.sub};
+  color: ${p => p.$active ? p.theme.main : p.theme.sub};
 
   &:hover {
     color: ${p => p.theme.text};

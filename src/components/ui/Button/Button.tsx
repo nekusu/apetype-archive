@@ -21,7 +21,7 @@ function Button({ children, active, text, navigate: to, onClick, ...rest }: Prop
       }}
       whileTap={{ scale: text ? 1 : 0.925 }}
       transition={{ duration: 0.15 }}
-      active={active}
+      $active={active}
       {...rest}
     >
       {children}
