@@ -4,14 +4,22 @@ import { RiCursorFill } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { Loading } from '../ui';
 import languages from '../../languages/_list';
-import { setWords, updateWord, setIsRunning, setIsTyping } from './TypingTest.slice';
+import {
+  setRawWords,
+  setWords,
+  updateWord,
+  setIsRunning,
+  setIsTyping,
+  restartState,
+} from './TypingTest.slice';
 import Styled from './TypingTest.styles';
 import shuffleArray from '../../utils/shuffleArray';
 
 function TypingTest() {
   const isPresent = useIsPresent();
   const dispatch = useAppDispatch();
-  const { words, isTyping } = useAppSelector(({ typingTest }) => typingTest);
+  const { language } = useAppSelector(({ config }) => config);
+  const { rawWords, words, isTyping } = useAppSelector(({ typingTest }) => typingTest);
   const [wordIndex, setWordIndex] = useState(0);
   const [isFocused, setIsFocused] = useState(true);
   const [inputValue, setInputValue] = useState(' ');
@@ -22,7 +30,8 @@ function TypingTest() {
   const currentLetter = useRef<HTMLSpanElement>(null);
   const blurTimeout = useRef<NodeJS.Timer>();
   const typingTimeout = useRef<NodeJS.Timer>();
-  const focusWords = () => {
+  const focusWords = (e: KeyboardEvent | React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
     clearTimeout(blurTimeout.current);
     input.current?.focus();
     setIsFocused(true);
@@ -33,14 +42,15 @@ function TypingTest() {
     blurTimeout.current = setTimeout(() => setIsFocused(false), 1000);
   };
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!words.length) return;
     const { value } = e.target;
     const typed = [...value.trim()];
 
+    dispatch(updateWord({ wordIndex, typed }));
     dispatch(setIsRunning(true));
     dispatch(setIsTyping(true));
     clearTimeout(typingTimeout.current);
     typingTimeout.current = setTimeout(() => dispatch(setIsTyping(false)), 1000);
-    dispatch(updateWord({ wordIndex, typed }));
     if (!value) {
       if (wordIndex > 0) {
         const previousWord = words[wordIndex - 1].letters
@@ -61,20 +71,23 @@ function TypingTest() {
   };
 
   useEffect(() => {
-    window.addEventListener('keypress', focusWords);
     input.current?.focus();
-    (async () => {
-      const words = await getWords();
-      dispatch(setWords(shuffleArray(words)));
-    })();
-  }, [dispatch]);
-  useEffect(() => {
-    if (!isPresent) {
-      window.removeEventListener('keypress', focusWords);
-      dispatch(setIsRunning(false));
-      dispatch(setWords([]));
+    if (rawWords.length) {
+      dispatch(setWords(shuffleArray(rawWords as [])));
+    } else {
+      (async () => {
+        const rawWords = await getWords(language);
+        dispatch(setRawWords(rawWords));
+      })();
     }
+  }, [dispatch, language, rawWords]);
+  useEffect(() => {
+    if (!isPresent) dispatch(restartState());
   }, [dispatch, isPresent]);
+  useEffect(() => {
+    if (!isFocused) window.addEventListener('keydown', focusWords);
+    return () => window.removeEventListener('keydown', focusWords);
+  }, [isFocused]);
   useEffect(() => {
     const top = currentWord.current?.offsetTop || 2;
     const left = currentLetter.current
@@ -82,7 +95,6 @@ function TypingTest() {
       : currentWord.current
         ? currentWord.current.offsetLeft
         : 0;
-
     wordsWrapper.current?.scrollTo({ top: top - 44, behavior: 'smooth' });
     setCaretPosition({ top, left });
   }, [inputValue, wordIndex]);
@@ -95,7 +107,7 @@ function TypingTest() {
         onChange={handleInput}
         onBlur={blurWords}
       />
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence>
         {words.length
           ? <Styled.Wrapper
             key="words-wrapper"
@@ -149,9 +161,8 @@ function TypingTest() {
 }
 
 const languageURL = (lang: string) => `https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/${lang}.json`;
-const getWords = async () => {
-  const [defaultLanguage] = languages;
-  const reponse = await fetch(languageURL(defaultLanguage));
+const getWords = async (language: string = languages[0]) => {
+  const reponse = await fetch(languageURL(language));
   const { words } = await reponse.json();
   return words;
 };

@@ -61,6 +61,7 @@ const Caret = styled(m.div).attrs(() => ({
   position: absolute;
   border-radius: 2px;
   background-color: ${p => p.theme.caret};
+  transition: background-color 0.25s;
 `;
 
 const Words = styled(m.div).attrs(() => ({
@@ -91,6 +92,7 @@ const Letter = styled.span<{ $status?: string; }>`
       : p.$status === 'extra'
         ? p.theme.colorfulErrorExtra
         : p.theme.sub};
+  transition: color ${p => !p.$status ? '0.25s' : '0s'};
 `;
 
 const Styled = {
