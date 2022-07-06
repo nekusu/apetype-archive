@@ -10,8 +10,8 @@ import Styled from './Home.styles';
 function Home() {
   const dispatch = useAppDispatch();
   const { randomTheme, mode, time } = useAppSelector(({ config }) => config);
-  const { seconds } = useAppSelector(({ testStats }) => testStats);
-  const [testId, setTestId] = useState(uniqid());
+  const [id, setId] = useState(uniqid());
+  const testId = `${mode}-${time}-${id}`;
   const chooseRandomTheme = useCallback(async () => {
     if (randomTheme === 'off') return;
     let filteredThemes = themes;
@@ -22,7 +22,7 @@ function Home() {
     dispatch(setTheme((await import(`../../themes/${newTheme.name}.ts`)).default));
   }, [dispatch, randomTheme]);
   const restartTest = useCallback(() => {
-    setTestId(uniqid());
+    setId(uniqid());
     chooseRandomTheme();
   }, [chooseRandomTheme]);
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -37,17 +37,12 @@ function Home() {
     chooseRandomTheme();
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [chooseRandomTheme, handleKeyDown]);
-  useEffect(() => {
-    if (!seconds) {
-      restartTest();
-    }
-  }, [restartTest, seconds]);
 
   return (
     <Styled.Home>
       <TestStats />
       <AnimatePresence exitBeforeEnter>
-        <TypingTest key={`${mode}-${time}-${testId}`} />
+        <TypingTest key={testId} />
       </AnimatePresence>
     </Styled.Home>
   );

@@ -51,8 +51,8 @@ const Wrapper = styled.div<{ $blurred: boolean; }>`
 const Caret = styled(m.div).attrs(() => ({
   transition: {
     opacity: { repeat: Infinity, duration: 1 },
-    top: { ease: 'linear', duration: 0.075 },
-    left: { ease: 'linear', duration: 0.075 },
+    top: { ease: 'easeOut', duration: 0.1 },
+    left: { ease: 'easeOut', duration: 0.1 },
   },
 }))`
   height: 35px;
@@ -81,9 +81,10 @@ const Word = styled.div<{ $error: boolean; }>`
   display: flex;
   font-size: 24px;
   border-bottom: 2px solid ${p => p.$error ? p.theme.colorfulError : 'transparent'};
+  transition: border-color 0.1s ease-out;
 `;
 
-const Letter = styled.span<{ $status?: string; }>`
+const Letter = styled.span<{ $status: ApeTypes.Letter['status']; }>`
   display: inline-block;
   color: ${p => p.$status === 'correct'
     ? p.theme.main
@@ -92,7 +93,7 @@ const Letter = styled.span<{ $status?: string; }>`
       : p.$status === 'extra'
         ? p.theme.colorfulErrorExtra
         : p.theme.sub};
-  transition: color ${p => !p.$status ? '0.25s' : '0s'};
+  transition: color 0.1s ease-out;
 `;
 
 const Styled = {

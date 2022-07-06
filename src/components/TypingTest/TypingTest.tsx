@@ -7,10 +7,10 @@ import languages from '../../languages/_list';
 import {
   setRawWords,
   setWords,
-  updateWord,
-  setIsRunning,
+  checkInput,
+  setTimer,
   setIsTyping,
-  restartState,
+  resetTest,
 } from './TypingTest.slice';
 import Styled from './TypingTest.styles';
 import shuffleArray from '../../utils/shuffleArray';
@@ -18,11 +18,16 @@ import shuffleArray from '../../utils/shuffleArray';
 function TypingTest() {
   const isPresent = useIsPresent();
   const dispatch = useAppDispatch();
-  const { language } = useAppSelector(({ config }) => config);
-  const { rawWords, words, isTyping } = useAppSelector(({ typingTest }) => typingTest);
-  const [wordIndex, setWordIndex] = useState(0);
+  const { time, language } = useAppSelector(({ config }) => config);
+  const {
+    rawWords,
+    words,
+    wordIndex,
+    inputValue,
+    isRunning,
+    isTyping,
+  } = useAppSelector(({ typingTest }) => typingTest);
   const [isFocused, setIsFocused] = useState(true);
-  const [inputValue, setInputValue] = useState(' ');
   const [caretPosition, setCaretPosition] = useState({ top: 0, left: 0 });
   const input = useRef<HTMLInputElement>(null);
   const wordsWrapper = useRef<HTMLDivElement>(null);
@@ -44,30 +49,15 @@ function TypingTest() {
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!words.length) return;
     const { value } = e.target;
-    const typed = [...value.trim()];
 
-    dispatch(updateWord({ wordIndex, typed }));
-    dispatch(setIsRunning(true));
+    if (!isRunning) {
+      dispatch(setTimer(time));
+    }
+
+    dispatch(checkInput(value));
     dispatch(setIsTyping(true));
     clearTimeout(typingTimeout.current);
     typingTimeout.current = setTimeout(() => dispatch(setIsTyping(false)), 1000);
-    if (!value) {
-      if (wordIndex > 0) {
-        const previousWord = words[wordIndex - 1].letters
-          .reduce((word, letter) => word + (letter.typed || ''), '');
-        setInputValue(` ${previousWord}`);
-        setWordIndex((index) => index - 1);
-      } else {
-        setInputValue(' ');
-      }
-    } else if (value.endsWith(' ')) {
-      setInputValue(' ');
-      if (value.length > 2) {
-        setWordIndex((index) => index + 1);
-      }
-    } else {
-      setInputValue(value);
-    }
   };
 
   useEffect(() => {
@@ -82,7 +72,7 @@ function TypingTest() {
     }
   }, [dispatch, language, rawWords]);
   useEffect(() => {
-    if (!isPresent) dispatch(restartState());
+    if (!isPresent) dispatch(resetTest());
   }, [dispatch, isPresent]);
   useEffect(() => {
     if (!isFocused) window.addEventListener('keydown', focusWords);

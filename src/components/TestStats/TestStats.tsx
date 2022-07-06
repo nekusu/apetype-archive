@@ -1,32 +1,32 @@
 import { useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { setTimer, incrementTimer, decrementTimer } from './TestStats.slice';
+import { decrementTimer } from '../TypingTest/TypingTest.slice';
 import Styled from './TestStats.styles';
 
 function TestStats() {
   const dispatch = useAppDispatch();
-  const { time } = useAppSelector(({ config }) => config);
-  const { isRunning } = useAppSelector(({ typingTest }) => typingTest);
-  const { seconds } = useAppSelector(({ testStats }) => testStats);
+  const { characters, errors, wpm, timer, isRunning } = useAppSelector(({ typingTest }) => typingTest);
+  const accuracy = Math.floor((1 - errors / characters) * 100);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isRunning) {
-      dispatch(setTimer(time));
       interval = setInterval(() => {
-        dispatch(time ? decrementTimer() : incrementTimer());
+        dispatch(decrementTimer());
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [dispatch, isRunning, time]);
+  }, [dispatch, isRunning]);
 
   return (
     <Styled.Wrapper>
       <AnimatePresence>
         {isRunning && (
           <Styled.TestStats>
-            <div>{seconds}</div>
+            <div>{timer}</div>
+            <div>{accuracy}%</div>
+            <div>{wpm}</div>
           </Styled.TestStats>
         )}
       </AnimatePresence>

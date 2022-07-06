@@ -13,7 +13,7 @@ const TestStats = styled(m.div).attrs(() => ({
   exit: { opacity: 0 },
 }))`
   display: flex;
-  gap: 20px;
+  gap: 30px;
   font-size: 24px;
   line-height: 24px;
   color: ${p => p.theme.main};
