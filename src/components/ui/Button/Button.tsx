@@ -6,11 +6,12 @@ interface Props extends HTMLMotionProps<'button'> {
   children: React.ReactNode;
   active?: boolean;
   text?: boolean;
+  alt?: boolean;
   navigate?: string;
 }
 
-function Button({ children, active, text, navigate: to, onClick, ...rest }: Props) {
-  const StyledButton = text ? Styled.TextButton : Styled.Button;
+function Button({ children, active, text, alt, navigate: to, onClick, ...rest }: Props) {
+  const StyledButton = text ? Styled.TextButton : alt ? Styled.AltButton : Styled.Button;
   const navigate = useNavigate();
 
   return (

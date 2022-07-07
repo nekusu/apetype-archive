@@ -35,9 +35,17 @@ const TextButton = styled(Button) <{ $active?: boolean; }>`
   }
 `;
 
+const AltButton = styled(TextButton)`
+  &:active {
+    background: ${p => p.theme.text};
+    color: ${p => p.theme.bg};
+  }
+`;
+
 const Styled = {
   Button,
   TextButton,
+  AltButton,
 };
 
 export default Styled;
