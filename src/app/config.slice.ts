@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import defaultColors from '../themes/aurora';
 
 const slice = createSlice({
   name: 'config',
   initialState: {
     theme: {
-      name: '8008',
+      name: 'aurora',
       mode: 'dark',
+      colors: defaultColors,
     },
     randomTheme: 'dark',
     mode: 'time',

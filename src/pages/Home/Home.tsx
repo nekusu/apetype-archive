@@ -9,18 +9,23 @@ import Styled from './Home.styles';
 
 function Home() {
   const dispatch = useAppDispatch();
-  const { randomTheme, mode, time } = useAppSelector(({ config }) => config);
+  const { theme, randomTheme, mode, time } = useAppSelector(({ config }) => config);
   const [id, setId] = useState(uniqid());
   const testId = `${mode}-${time}-${id}`;
   const chooseRandomTheme = useCallback(async () => {
     if (randomTheme === 'off') return;
     let filteredThemes = themes;
     if (randomTheme === 'light' || randomTheme === 'dark') {
-      filteredThemes = themes.filter((theme) => theme.mode === randomTheme);
+      filteredThemes = themes.filter((t) => t.mode === randomTheme && t.name !== theme.name);
     }
     const newTheme = filteredThemes[Math.floor(Math.random() * filteredThemes.length)];
-    dispatch(setTheme((await import(`../../themes/${newTheme.name}.ts`)).default));
-  }, [dispatch, randomTheme]);
+    const colors = (await import(`../../themes/${newTheme.name}.ts`)).default;
+    dispatch(setTheme({
+      name: newTheme.name,
+      mode: newTheme.mode,
+      colors,
+    }));
+  }, [dispatch, theme, randomTheme]);
   const restartTest = useCallback(() => {
     setId(uniqid());
     chooseRandomTheme();
@@ -34,9 +39,8 @@ function Home() {
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
-    chooseRandomTheme();
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [chooseRandomTheme, handleKeyDown]);
+  }, [handleKeyDown]);
 
   return (
     <Styled.Home>

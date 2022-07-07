@@ -10,6 +10,7 @@ declare namespace ApeTypes {
   interface Theme {
     name: string;
     mode: 'light' | 'dark';
+    colors: DefaultTheme;
   }
 
   interface Letter {

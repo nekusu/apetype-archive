@@ -9,7 +9,7 @@ function Provider({ children }: Props) {
   const { theme } = useAppSelector(({ config }) => config);
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme.colors}>
       {children}
     </ThemeProvider>
   );

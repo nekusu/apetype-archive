@@ -1,4 +1,4 @@
-const themes: ApeTypes.Theme[] = [
+const themes: Omit<ApeTypes.Theme, 'colors'>[] = [
   {
     name: '8008',
     mode: 'dark',
