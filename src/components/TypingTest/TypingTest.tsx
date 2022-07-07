@@ -9,6 +9,7 @@ import {
   setWords,
   checkInput,
   setTimer,
+  setIsReady,
   setIsTyping,
   resetTest,
 } from './TypingTest.slice';
@@ -24,6 +25,7 @@ function TypingTest() {
     words,
     wordIndex,
     inputValue,
+    isReady,
     isRunning,
     isTyping,
   } = useAppSelector(({ typingTest }) => typingTest);
@@ -47,7 +49,7 @@ function TypingTest() {
     blurTimeout.current = setTimeout(() => setIsFocused(false), 1000);
   };
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!words.length) return;
+    if (!isReady) return;
     const { value } = e.target;
 
     if (!isRunning) {
@@ -61,6 +63,7 @@ function TypingTest() {
   };
 
   useEffect(() => {
+    dispatch(resetTest());
     input.current?.focus();
     if (rawWords.length) {
       dispatch(setWords(shuffleArray(rawWords as [])));
@@ -72,7 +75,7 @@ function TypingTest() {
     }
   }, [dispatch, language, rawWords]);
   useEffect(() => {
-    if (!isPresent) dispatch(resetTest());
+    if (!isPresent) dispatch(setIsReady(false));
   }, [dispatch, isPresent]);
   useEffect(() => {
     if (!isFocused) window.addEventListener('keydown', focusWords);
@@ -98,7 +101,7 @@ function TypingTest() {
         onBlur={blurWords}
       />
       <AnimatePresence>
-        {words.length
+        {isReady
           ? <Styled.Wrapper
             key="words-wrapper"
             ref={wordsWrapper}
@@ -140,7 +143,7 @@ function TypingTest() {
           : <Loading />
         }
       </AnimatePresence>
-      {!!words.length && !isFocused && (
+      {isReady && !isFocused && (
         <Styled.OutOfFocus>
           <RiCursorFill />
           Click or press any key to focus

@@ -5,13 +5,22 @@ interface State {
   words: ApeTypes.Word[];
   wordIndex: number;
   inputValue: string;
+  raw: number;
+  wpm: number;
   characters: number;
   errors: number;
-  wpm: number;
+  dataset: {
+    raw: number[];
+    wpm: number[];
+    characters: number[];
+    errors: number[];
+  };
   timer: number;
   elapsedTime: number;
+  isReady: boolean;
   isRunning: boolean;
   isTyping: boolean;
+  isFinished: boolean;
 }
 
 const initialState: State = {
@@ -19,13 +28,22 @@ const initialState: State = {
   words: [],
   wordIndex: 0,
   inputValue: ' ',
+  raw: 0,
+  wpm: 0,
   characters: 0,
   errors: 0,
-  wpm: 0,
+  dataset: {
+    raw: [],
+    wpm: [],
+    characters: [],
+    errors: [],
+  },
   timer: 0,
   elapsedTime: 0,
+  isReady: false,
   isRunning: false,
   isTyping: false,
+  isFinished: false,
 };
 
 const slice = createSlice({
@@ -41,6 +59,7 @@ const slice = createSlice({
         isCorrect: false,
         letters: [...word].map((letter) => ({ original: letter })),
       }));
+      state.isReady = true;
     },
     checkInput: (state, action: PayloadAction<string>) => {
       const value = action.payload;
@@ -129,17 +148,45 @@ const slice = createSlice({
       state.isRunning = true;
     },
     decrementTimer: (state) => {
-      const correctWords = state.words.filter((word) => word.isCorrect);
-      const text = correctWords.map((word) => word.typed).join(' ');
-      const wordCount = text.length / 5;
-      state.wpm = Math.floor(wordCount / (++state.elapsedTime / 60));
-      state.timer--;
-      if (state.timer === 0) {
-        state.isRunning = false;
+      const { dataset } = state;
+      const characters = state.characters - dataset.characters.reduce((a, b) => a + b, 0);
+      let rawText = '';
+      let wpmText = '';
+      for (let i = 0; i < state.wordIndex; i++) {
+        const word = state.words[i];
+        if (word.isCorrect) {
+          wpmText += ` ${word.typed}`;
+        }
+        rawText += ` ${word.typed}`;
       }
+      rawText = rawText.trim();
+      wpmText = wpmText.trim();
+      const elapsedTime = ++state.elapsedTime;
+      const raw = Math.round(characters / 5 / (1 / 60));
+      const wpm = Math.round(wpmText.length / 5 / (elapsedTime / 60));
+      const errors = state.errors - dataset.errors.reduce((a, b) => a + b, 0);
+      state.timer--;
+      state.raw = Math.round(rawText.length / 5 / (elapsedTime / 60));
+      state.wpm = wpm;
+      dataset.raw.push(raw);
+      dataset.wpm.push(wpm);
+      dataset.characters.push(characters);
+      dataset.errors.push(errors);
+      if (state.timer === 0) {
+        state.isReady = false;
+        state.isRunning = false;
+        state.isTyping = false;
+        state.isFinished = true;
+      }
+    },
+    setIsReady: (state, action: PayloadAction<boolean>) => {
+      state.isReady = action.payload;
     },
     setIsTyping: (state, action: PayloadAction<boolean>) => {
       state.isTyping = action.payload;
+    },
+    setIsFinished: (state, action: PayloadAction<boolean>) => {
+      state.isFinished = action.payload;
     },
     resetTest: (state) => {
       const { rawWords } = state;
@@ -155,7 +202,9 @@ export const {
   checkInput,
   setTimer,
   decrementTimer,
+  setIsReady,
   setIsTyping,
+  setIsFinished,
   resetTest,
 } = slice.actions;
 export default slice.reducer;
