@@ -8,17 +8,18 @@ import {
   RiLoginCircleFill,
 } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { setMode, setTime } from '../../app/config.slice';
+import { setMode, setTime, setWords } from '../../app/config.slice';
 import { Button } from '../ui';
 import Styled from './Header.styles';
 
 function Header() {
   const dispatch = useAppDispatch();
-  const { mode, time } = useAppSelector(({ config }) => config);
+  const { mode, time, words } = useAppSelector(({ config }) => config);
   const { isTyping } = useAppSelector(({ typingTest }) => typingTest);
   const navigate = useNavigate();
-  const modes = ['time'];
-  const times = [15, 30, 60, 120];
+  const modes = ['time', 'words'];
+  const timeAmount = [15, 30, 60, 120];
+  const wordsAmount = [10, 25, 50, 100];
 
   return (
     <Styled.Header>
@@ -66,16 +67,27 @@ function Header() {
               ))}
             </Styled.ConfigGroup>
             <Styled.ConfigGroup>
-              {times.map((t) => (
-                <Button
-                  onClick={() => dispatch(setTime(t as ApeTypes.Config['time']))}
-                  key={t}
-                  text
-                  active={time === t}
-                >
-                  {t}
-                </Button>
-              ))}
+              {(mode === 'time' ? timeAmount
+                : mode === 'words' ? wordsAmount
+                  : []).map((x) => (
+                    <Button
+                      onClick={() => {
+                        if (mode === 'time') {
+                          dispatch(setTime(x as ApeTypes.Config['time']));
+                        } else if (mode === 'words') {
+                          dispatch(setWords(x as ApeTypes.Config['words']));
+                        }
+                      }}
+                      key={x}
+                      text
+                      active={
+                        mode === 'time' && time === x ||
+                        mode === 'words' && words === x
+                      }
+                    >
+                      {x}
+                    </Button>
+                  ))}
             </Styled.ConfigGroup>
           </Styled.Config>
         )}

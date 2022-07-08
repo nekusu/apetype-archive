@@ -6,11 +6,11 @@ const TypingTest = styled(m.div).attrs(() => ({
   animate: { opacity: 1 },
   exit: { opacity: 0 },
 }))`
-  height: 116px;
+  max-height: 122px;
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   user-select: none;
 `;
@@ -41,6 +41,7 @@ const OutOfFocus = styled(m.div).attrs(() => ({
 const Wrapper = styled.div<{ $blurred: boolean; }>`
   padding: 4px 2px;
   position: relative;
+  flex: 1 1;
   opacity: ${p => p.$blurred ? '0.4' : '1'} !important;
   filter: ${p => p.$blurred ? 'blur(5px)' : 'none'};
   cursor: ${p => p.$blurred ? 'pointer' : 'auto'};

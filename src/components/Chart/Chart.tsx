@@ -18,9 +18,12 @@ import Styled from './Chart.styles';
 
 function Chart() {
   const theme = useTheme();
-  const { dataset, elapsedTime } = useAppSelector(({ typingTest }) => typingTest);
-  const { raw, wpm, errors } = dataset;
-  const labels = Array(elapsedTime).fill(0).map((_, i) => i + 1);
+  const { stats, elapsedTime } = useAppSelector(({ typingTest }) => typingTest);
+  const { raw, wpm, errorCount } = stats;
+  const labels = Array(stats.raw.length).fill(0).map((_, i) => i + 1);
+  if (stats.raw.length > elapsedTime) {
+    labels[stats.raw.length - 1] = elapsedTime;
+  }
   const options: ChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -67,7 +70,7 @@ function Chart() {
           color: theme.sub,
         },
         beginAtZero: true,
-        max: Math.max(...errors) + 1,
+        max: Math.max(...errorCount) + 1,
         ticks: {
           precision: 0,
           autoSkip: true,
@@ -101,7 +104,7 @@ function Chart() {
         type: 'line' as const,
         label: 'raw',
         fill: true,
-        data: raw,
+        data: raw.map((r) => Math.floor(r)),
         borderColor: theme.sub,
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
         borderWidth: 2,
@@ -114,7 +117,7 @@ function Chart() {
         type: 'line' as const,
         label: 'wpm',
         fill: true,
-        data: wpm,
+        data: wpm.map((w) => Math.floor(w)),
         borderColor: theme.main,
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
         borderWidth: 2,
@@ -126,7 +129,7 @@ function Chart() {
       {
         type: 'scatter' as const,
         label: 'errors',
-        data: errors.map((e) => (e) ? e : null),
+        data: errorCount.map((e) => (e) ? e : null),
         borderColor: theme.colorfulError,
         pointBackgroundColor: theme.colorfulError,
         borderWidth: 2,

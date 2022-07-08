@@ -12,6 +12,7 @@ const slice = createSlice({
     randomTheme: 'dark',
     mode: 'time',
     time: 15,
+    words: 10,
     language: 'english',
   } as ApeTypes.Config,
   reducers: {
@@ -27,6 +28,9 @@ const slice = createSlice({
     setTime: (state, action: PayloadAction<ApeTypes.Config['time']>) => {
       state.time = action.payload;
     },
+    setWords: (state, action: PayloadAction<ApeTypes.Config['words']>) => {
+      state.words = action.payload;
+    },
     setLanguage: (state, action: PayloadAction<ApeTypes.Config['language']>) => {
       state.language = action.payload;
     },
@@ -38,6 +42,7 @@ export const {
   setRandomTheme,
   setMode,
   setTime,
+  setWords,
   setLanguage,
 } = slice.actions;
 export default slice.reducer;

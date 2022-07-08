@@ -5,18 +5,22 @@ import kogasa from '../../utils/kogasa';
 import Styled from './TestResults.styles';
 
 function TestResults() {
-  const { mode, time, language } = useAppSelector(({ config }) => config);
+  const { mode, time, words, language } = useAppSelector(({ config }) => config);
   const {
-    words,
+    testWords,
     raw,
     wpm,
-    characters: characterCount,
-    errors,
-    dataset,
+    characterCount,
+    errorCount,
+    stats,
     elapsedTime,
   } = useAppSelector(({ typingTest }) => typingTest);
-  const accuracy = Math.floor((1 - errors / characterCount) * 100);
-  const characters = words.reduce((characters, word) => {
+  const intRaw = Math.floor(raw);
+  const intWpm = Math.floor(wpm);
+  const accuracy = Math.floor((1 - errorCount / characterCount) * 100);
+  const consistency = kogasa(stats.raw);
+  const intConsistency = Math.floor(consistency);
+  const characters = testWords.reduce((characters, word) => {
     word.letters.forEach(({ status }) => {
       if (!status) return;
       if (status === 'correct') {
@@ -34,14 +38,13 @@ function TestResults() {
     extra: 0,
     missed: 0,
   });
-  const consistency = Math.floor(kogasa(dataset.raw));
 
   return (
     <Styled.TestResults>
       <Styled.Stats>
         <StatGroup
           title={{ text: 'wpm', size: 32 }}
-          values={[{ text: wpm, size: 64 }]}
+          values={[{ text: intWpm, size: 64 }]}
         />
         <StatGroup
           title={{ text: 'acc', size: 32 }}
@@ -55,13 +58,13 @@ function TestResults() {
         <StatGroup
           title={{ text: 'test type' }}
           values={[
-            { text: `${mode} ${time}` },
+            { text: `${mode} ${mode === 'time' ? time : mode === 'words' ? words : null}` },
             { text: language },
           ]}
         />
         <StatGroup
           title={{ text: 'raw' }}
-          values={[{ text: raw, size: 32 }]}
+          values={[{ text: intRaw, size: 32 }]}
         />
         <StatGroup
           title={{ text: 'characters' }}
@@ -69,7 +72,7 @@ function TestResults() {
         />
         <StatGroup
           title={{ text: 'consistency' }}
-          values={[{ text: `${consistency}%`, size: 32 }]}
+          values={[{ text: `${intConsistency}%`, size: 32 }]}
         />
         <StatGroup
           title={{ text: 'time' }}

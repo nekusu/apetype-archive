@@ -6,11 +6,11 @@ import { Loading } from '../ui';
 import languages from '../../languages/_list';
 import {
   setRawWords,
-  setWords,
+  setTestWords,
   checkInput,
-  setTimer,
   setIsReady,
   setIsTyping,
+  startTest,
   resetTest,
 } from './TypingTest.slice';
 import Styled from './TypingTest.styles';
@@ -19,10 +19,10 @@ import shuffleArray from '../../utils/shuffleArray';
 function TypingTest() {
   const isPresent = useIsPresent();
   const dispatch = useAppDispatch();
-  const { time, language } = useAppSelector(({ config }) => config);
+  const { mode, words, language } = useAppSelector(({ config }) => config);
   const {
     rawWords,
-    words,
+    testWords,
     wordIndex,
     inputValue,
     isReady,
@@ -53,7 +53,7 @@ function TypingTest() {
     const { value } = e.target;
 
     if (!isRunning) {
-      dispatch(setTimer(time));
+      dispatch(startTest());
     }
 
     dispatch(checkInput(value));
@@ -66,14 +66,18 @@ function TypingTest() {
     dispatch(resetTest());
     input.current?.focus();
     if (rawWords.length) {
-      dispatch(setWords(shuffleArray(rawWords as [])));
+      const shuffledWords = shuffleArray(rawWords as []);
+      if (mode === 'words') {
+        shuffledWords.splice(words, shuffledWords.length);
+      }
+      dispatch(setTestWords(shuffledWords));
     } else {
       (async () => {
         const rawWords = await getWords(language);
         dispatch(setRawWords(rawWords));
       })();
     }
-  }, [dispatch, language, rawWords]);
+  }, [dispatch, mode, words, language, rawWords]);
   useEffect(() => {
     if (!isPresent) dispatch(setIsReady(false));
   }, [dispatch, isPresent]);
@@ -101,8 +105,8 @@ function TypingTest() {
         onBlur={blurWords}
       />
       <AnimatePresence>
-        {isReady
-          ? <Styled.Wrapper
+        {isReady && (
+          <Styled.Wrapper
             key="words-wrapper"
             ref={wordsWrapper}
             onClick={focusWords}
@@ -118,7 +122,7 @@ function TypingTest() {
               />
             )}
             <Styled.Words>
-              {words.map(({ original, typed, isCorrect, letters }, index) => (
+              {testWords.map(({ original, typed, isCorrect, letters }, index) => (
                 <Styled.Word
                   ref={wordIndex === index ? currentWord : null}
                   key={original}
@@ -140,8 +144,8 @@ function TypingTest() {
               ))}
             </Styled.Words>
           </Styled.Wrapper>
-          : <Loading />
-        }
+        )}
+        {!rawWords.length && <Loading />}
       </AnimatePresence>
       {isReady && !isFocused && (
         <Styled.OutOfFocus>

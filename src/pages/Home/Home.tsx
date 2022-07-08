@@ -12,10 +12,10 @@ import Styled from './Home.styles';
 
 function Home() {
   const dispatch = useAppDispatch();
-  const { theme, randomTheme, mode, time } = useAppSelector(({ config }) => config);
+  const { theme, randomTheme, mode, time, words } = useAppSelector(({ config }) => config);
   const { isFinished } = useAppSelector(({ typingTest }) => typingTest);
   const [id, setId] = useState(uniqid());
-  const testId = `${mode}-${time}-${id}`;
+  const testId = `${mode}-${mode === 'time' ? time : mode === 'words' ? words : ''}-${id}`;
   const chooseRandomTheme = useCallback(async () => {
     if (randomTheme === 'off') return;
     let filteredThemes = themes;
@@ -48,7 +48,7 @@ function Home() {
   }, [handleKeyDown]);
   useEffect(() => {
     dispatch(setIsFinished(false));
-  }, [dispatch, mode, time]);
+  }, [dispatch, mode, time, words]);
 
   return (
     <Styled.Home>
