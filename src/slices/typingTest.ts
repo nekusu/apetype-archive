@@ -22,6 +22,7 @@ interface State {
   isRunning: boolean;
   isTyping: boolean;
   isFinished: boolean;
+  isTestPopupOpen: boolean;
 }
 
 const initialState: State = {
@@ -46,6 +47,7 @@ const initialState: State = {
   isRunning: false,
   isTyping: false,
   isFinished: false,
+  isTestPopupOpen: false,
 };
 
 const slice = createSlice({
@@ -55,12 +57,13 @@ const slice = createSlice({
     setRawWords: (state, action: PayloadAction<string[]>) => {
       state.rawWords = action.payload;
     },
-    setTestWords: (state, action: PayloadAction<string[]>) => {
-      state.testWords = action.payload.map((word) => ({
+    addTestWords: (state, action: PayloadAction<string[]>) => {
+      const testWords = action.payload.map((word) => ({
         original: word,
         isCorrect: false,
         letters: [...word].map((letter) => ({ original: letter })),
       }));
+      state.testWords.push(...testWords);
       state.isReady = true;
     },
     checkInput: (state, action: PayloadAction<string>) => {
@@ -202,12 +205,15 @@ const slice = createSlice({
       Object.assign(state, initialState);
       state.rawWords = rawWords;
     },
+    setIsTestPopupOpen: (state, action: PayloadAction<boolean>) => {
+      state.isTestPopupOpen = action.payload;
+    },
   },
 });
 
 export const {
   setRawWords,
-  setTestWords,
+  addTestWords,
   checkInput,
   updateStats,
   setTimer,
@@ -218,5 +224,6 @@ export const {
   startTest,
   endTest,
   resetTest,
+  setIsTestPopupOpen,
 } = slice.actions;
 export default slice.reducer;

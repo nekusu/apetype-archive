@@ -3,8 +3,8 @@ declare namespace ApeTypes {
     theme: Theme;
     randomTheme: 'off' | 'on' | 'light' | 'dark';
     mode: 'time' | 'words';
-    time: 15 | 30 | 60 | 120;
-    words: 10 | 25 | 50 | 100;
+    time: number;
+    words: number;
     language: string;
   }
 

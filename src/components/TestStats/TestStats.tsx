@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { decrementTimer, endTest, setTimer, updateStats } from '../../slices/typingTest';
@@ -17,8 +17,16 @@ function TestStats() {
     isFinished,
   } = useAppSelector(({ typingTest }) => typingTest);
   const intWpm = Math.floor(wpm);
+  const absTimer = Math.abs(timer);
   const accuracy = (1 - errorCount / characterCount) * 100;
   const intAccuracy = Math.floor(accuracy);
+  const handleShiftEnter = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Enter' && e.shiftKey) {
+      e.preventDefault();
+      dispatch(updateStats());
+      dispatch(endTest());
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -36,16 +44,20 @@ function TestStats() {
     return () => clearInterval(interval);
   }, [dispatch, mode, time, isRunning]);
   useEffect(() => {
-    if (
-      mode === 'time' && timer <= 0 ||
-      mode === 'words' && wordIndex >= words
-    ) {
+    if (mode === 'time' && time > 0 && timer <= 0 ||
+      mode === 'words' && words > 0 && wordIndex >= words) {
       if (mode !== 'time') {
         dispatch(updateStats());
       }
       dispatch(endTest());
     }
-  }, [dispatch, mode, words, timer, wordIndex]);
+  }, [dispatch, mode, time, words, timer, wordIndex]);
+  useEffect(() => {
+    if (isRunning && (!time || !words)) {
+      window.addEventListener('keydown', handleShiftEnter);
+    }
+    return () => window.removeEventListener('keydown', handleShiftEnter);
+  }, [time, words, handleShiftEnter, isRunning]);
 
   return (
     <Styled.Wrapper>
@@ -53,9 +65,9 @@ function TestStats() {
         {(isRunning || isFinished) && (
           <Styled.TestStats>
             {mode === 'time'
-              ? <div>timer</div>
+              ? <div>{absTimer}</div>
               : mode === 'words'
-                ? <div>{wordIndex}/{words}</div>
+                ? <div>{wordIndex}{words ? '/' + words : ''}</div>
                 : null
             }
             <div>{intWpm}</div>

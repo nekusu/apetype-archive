@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, useIsPresent } from 'framer-motion';
 import { RiCursorFill } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
@@ -6,7 +6,7 @@ import { Loading } from '../ui';
 import languages from '../../languages/_list';
 import {
   setRawWords,
-  setTestWords,
+  addTestWords,
   checkInput,
   setIsReady,
   setIsTyping,
@@ -14,7 +14,6 @@ import {
   resetTest,
 } from '../../slices/typingTest';
 import Styled from './TypingTest.styles';
-import shuffleArray from '../../utils/shuffleArray';
 
 function TypingTest() {
   const isPresent = useIsPresent();
@@ -28,15 +27,24 @@ function TypingTest() {
     isReady,
     isRunning,
     isTyping,
+    isTestPopupOpen,
   } = useAppSelector(({ typingTest }) => typingTest);
   const [isFocused, setIsFocused] = useState(true);
-  const [caretPosition, setCaretPosition] = useState({ top: 0, left: 0 });
+  const [caretPosition, setCaretPosition] = useState({ top: 2, left: 0 });
   const input = useRef<HTMLInputElement>(null);
   const wordsWrapper = useRef<HTMLDivElement>(null);
   const currentWord = useRef<HTMLDivElement>(null);
   const currentLetter = useRef<HTMLSpanElement>(null);
   const blurTimeout = useRef<NodeJS.Timer>();
   const typingTimeout = useRef<NodeJS.Timer>();
+  const lastCaretTopPosition = useRef(2);
+  const generateTestWords = useCallback((amount: number) => {
+    const newTestWords: Set<string> = new Set();
+    while (newTestWords.size < amount) {
+      newTestWords.add(rawWords[Math.floor(Math.random() * rawWords.length)]);
+    }
+    dispatch(addTestWords([...newTestWords]));
+  }, [dispatch, rawWords]);
   const focusWords = (e: KeyboardEvent | React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     clearTimeout(blurTimeout.current);
@@ -51,11 +59,9 @@ function TypingTest() {
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isReady) return;
     const { value } = e.target;
-
     if (!isRunning) {
       dispatch(startTest());
     }
-
     dispatch(checkInput(value));
     dispatch(setIsTyping(true));
     clearTimeout(typingTimeout.current);
@@ -66,35 +72,45 @@ function TypingTest() {
     dispatch(resetTest());
     input.current?.focus();
     if (rawWords.length) {
-      const shuffledWords = shuffleArray(rawWords as []);
-      if (mode === 'words') {
-        shuffledWords.splice(words, shuffledWords.length);
+      if (mode === 'words' && words > 0) {
+        generateTestWords(Math.min(words, 50));
+      } else {
+        generateTestWords(50);
       }
-      dispatch(setTestWords(shuffledWords));
     } else {
       (async () => {
-        const rawWords = await getWords(language);
+        const rawWords = await getRawWords(language);
         dispatch(setRawWords(rawWords));
       })();
     }
-  }, [dispatch, mode, words, language, rawWords]);
+  }, [dispatch, mode, words, language, rawWords, generateTestWords]);
   useEffect(() => {
     if (!isPresent) dispatch(setIsReady(false));
   }, [dispatch, isPresent]);
   useEffect(() => {
-    if (!isFocused) window.addEventListener('keydown', focusWords);
+    if (!isTestPopupOpen && !isFocused) window.addEventListener('keydown', focusWords);
     return () => window.removeEventListener('keydown', focusWords);
-  }, [isFocused]);
+  }, [isTestPopupOpen, isFocused]);
   useEffect(() => {
     const top = currentWord.current?.offsetTop || 2;
     const left = currentLetter.current
       ? currentLetter.current.offsetLeft + currentLetter.current.offsetWidth + 1
-      : currentWord.current
-        ? currentWord.current.offsetLeft
-        : 0;
+      : currentWord.current?.offsetLeft || 0;
     wordsWrapper.current?.scrollTo({ top: top - 44, behavior: 'smooth' });
     setCaretPosition({ top, left });
   }, [inputValue, wordIndex]);
+  useEffect(() => {
+    if (caretPosition.top > lastCaretTopPosition.current) {
+      lastCaretTopPosition.current = caretPosition.top;
+      if (mode === 'words' && words > 0) {
+        if (testWords.length < words) {
+          generateTestWords(Math.min(words - testWords.length, 12));
+        }
+      } else {
+        generateTestWords(12);
+      }
+    }
+  }, [mode, words, testWords, caretPosition.top, generateTestWords]);
 
   return (
     <Styled.TypingTest>
@@ -124,16 +140,16 @@ function TypingTest() {
             <Styled.Words>
               {testWords.map(({ original, typed, isCorrect, letters }, index) => (
                 <Styled.Word
-                  ref={wordIndex === index ? currentWord : null}
-                  key={original}
+                  ref={wordIndex === index
+                    ? currentWord : null}
+                  key={`${original}-${index}`}
                   $error={wordIndex > index && !isCorrect}
                 >
                   {letters.map((letter, i) => (
                     <Styled.Letter
                       ref={wordIndex === index &&
                         ((typed?.length || 0) - 1) === i
-                        ? currentLetter
-                        : null}
+                        ? currentLetter : null}
                       key={i}
                       $status={letter.status}
                     >
@@ -158,7 +174,7 @@ function TypingTest() {
 }
 
 const languageURL = (lang: string) => `https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/${lang}.json`;
-const getWords = async (language: string = languages[0]) => {
+const getRawWords = async (language: string = languages[0]) => {
   const reponse = await fetch(languageURL(language));
   const { words } = await reponse.json();
   return words;

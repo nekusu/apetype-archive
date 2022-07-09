@@ -13,6 +13,12 @@ const Home = styled(m.div).attrs(() => ({
   flex: 1;
 `;
 
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
 const Wrapper = styled(m.div).attrs(() => ({
   initial: { opacity: 0 },
   animate: { opacity: 1 },
@@ -37,6 +43,7 @@ const Buttons = styled.div`
 
 const Styled = {
   Home,
+  Form,
   Wrapper,
   Buttons,
 };
