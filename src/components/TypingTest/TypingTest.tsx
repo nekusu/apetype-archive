@@ -18,7 +18,8 @@ import Styled from './TypingTest.styles';
 function TypingTest() {
   const isPresent = useIsPresent();
   const dispatch = useAppDispatch();
-  const { mode, words, language } = useAppSelector(({ config }) => config);
+  const config = useAppSelector(({ config }) => config);
+  const { mode, words, language } = config;
   const {
     rawWords,
     testWords,
@@ -62,7 +63,7 @@ function TypingTest() {
     if (!isRunning) {
       dispatch(startTest());
     }
-    dispatch(checkInput(value));
+    dispatch(checkInput({ value, config }));
     dispatch(setIsTyping(true));
     clearTimeout(typingTimeout.current);
     typingTimeout.current = setTimeout(() => dispatch(setIsTyping(false)), 1000);
@@ -74,8 +75,10 @@ function TypingTest() {
     if (rawWords.length) {
       if (mode === 'words' && words > 0) {
         generateTestWords(Math.min(words, 50));
-      } else {
+      } else if (mode === 'time' || !words) {
         generateTestWords(50);
+      } else if (mode === 'zen') {
+        dispatch(setIsReady(true));
       }
     } else {
       (async () => {
@@ -106,7 +109,7 @@ function TypingTest() {
         if (testWords.length < words) {
           generateTestWords(Math.min(words - testWords.length, 12));
         }
-      } else {
+      } else if (mode === 'time' || !words) {
         generateTestWords(12);
       }
     }
@@ -123,7 +126,6 @@ function TypingTest() {
       <AnimatePresence>
         {isReady && (
           <Styled.Wrapper
-            key="words-wrapper"
             ref={wordsWrapper}
             onClick={focusWords}
             $blurred={!isFocused}

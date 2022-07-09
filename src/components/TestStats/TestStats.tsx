@@ -53,11 +53,11 @@ function TestStats() {
     }
   }, [dispatch, mode, time, words, timer, wordIndex]);
   useEffect(() => {
-    if (isRunning && (!time || !words)) {
+    if (isRunning && (mode === 'zen' || !time || !words)) {
       window.addEventListener('keydown', handleShiftEnter);
     }
     return () => window.removeEventListener('keydown', handleShiftEnter);
-  }, [time, words, handleShiftEnter, isRunning]);
+  }, [mode, time, words, handleShiftEnter, isRunning]);
 
   return (
     <Styled.Wrapper>
@@ -66,8 +66,11 @@ function TestStats() {
           <Styled.TestStats>
             {mode === 'time'
               ? <div>{absTimer}</div>
-              : mode === 'words'
-                ? <div>{wordIndex}{words ? '/' + words : ''}</div>
+              : mode === 'words' || mode === 'zen'
+                ? <div>
+                  {wordIndex}
+                  {mode !== 'zen' && words ? '/' + words : ''}
+                </div>
                 : null
             }
             <div>{intWpm}</div>

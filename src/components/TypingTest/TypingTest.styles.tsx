@@ -6,6 +6,7 @@ const TypingTest = styled(m.div).attrs(() => ({
   animate: { opacity: 1 },
   exit: { opacity: 0 },
 }))`
+  min-height: 38px;
   max-height: 122px;
   position: relative;
   display: flex;

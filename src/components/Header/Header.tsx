@@ -20,7 +20,7 @@ function Header() {
   const { isTyping } = useAppSelector(({ typingTest }) => typingTest);
   const navigate = useNavigate();
   const location = useLocation();
-  const modes = ['time', 'words'];
+  const modes = ['time', 'words', 'zen'];
   const timeAmount = [15, 30, 60, 120];
   const wordAmount = [10, 25, 50, 100];
   const setAmount = mode === 'time' ? setTime : setWords;
@@ -40,7 +40,7 @@ function Header() {
       <AnimatePresence>
         {!isTyping && (
           <>
-            <Styled.Menu key="menu">
+            <Styled.Menu>
               <Button text title="Home" navigate="/">
                 <RiKeyboardBoxFill />
               </Button>
@@ -58,12 +58,12 @@ function Header() {
               </Button>
             </Styled.Menu>
             {location.pathname === '/' && (
-              <Styled.Config key="config">
+              <Styled.Config>
                 <Styled.ConfigGroup>
                   {modes.map((m) => (
                     <Button
-                      onClick={() => dispatch(setMode(m as ApeTypes.Config['mode']))}
                       key={m}
+                      onClick={() => dispatch(setMode(m as ApeTypes.Config['mode']))}
                       text
                       active={mode === m}
                     >
@@ -75,8 +75,8 @@ function Header() {
                   <Styled.ConfigGroup>
                     {amount?.map((x) => (
                       <Button
-                        onClick={() => setAmount && dispatch(setAmount(x))}
                         key={x}
+                        onClick={() => setAmount && dispatch(setAmount(x))}
                         text
                         active={mode === 'time' && time === x ||
                           mode === 'words' && words === x}

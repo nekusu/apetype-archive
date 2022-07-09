@@ -2,7 +2,7 @@ declare namespace ApeTypes {
   interface Config {
     theme: Theme;
     randomTheme: 'off' | 'on' | 'light' | 'dark';
-    mode: 'time' | 'words';
+    mode: 'time' | 'words' | 'zen';
     time: number;
     words: number;
     language: string;
@@ -15,7 +15,7 @@ declare namespace ApeTypes {
   }
 
   interface Letter {
-    original: string;
+    original?: string;
     typed?: string;
     status?: 'correct' | 'incorrect' | 'extra' | 'missed';
   }

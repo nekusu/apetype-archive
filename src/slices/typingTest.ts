@@ -66,22 +66,34 @@ const slice = createSlice({
       state.testWords.push(...testWords);
       state.isReady = true;
     },
-    checkInput: (state, action: PayloadAction<string>) => {
-      const value = action.payload;
+    checkInput: (state, action: PayloadAction<{ value: string, config: ApeTypes.Config; }>) => {
+      const { value, config } = action.payload;
+      const { mode } = config;
       const trimmedValue = value.trim();
       const typedLetters = [...trimmedValue];
-      const word = state.testWords[state.wordIndex];
+      const emptyWord = {
+        original: '',
+        isCorrect: true,
+        letters: [],
+      };
+      let word = state.testWords[state.wordIndex];
+      if (!word) {
+        state.testWords.push(emptyWord);
+        word = state.testWords[state.wordIndex];
+      }
       const letters = [...word.letters];
 
       typedLetters.forEach((typedLetter, index) => {
         const letter = letters[index];
         if (!letter) {
           state.characterCount++;
-          state.errorCount++;
+          if (mode !== 'zen') {
+            state.errorCount++;
+          }
           letters.push({
-            original: '',
+            original: typedLetter,
             typed: typedLetter,
-            status: 'extra',
+            status: mode === 'zen' ? 'correct' : 'extra',
           });
         } else if (letter.typed !== typedLetter) {
           state.characterCount++;
@@ -95,11 +107,11 @@ const slice = createSlice({
         }
       });
 
-      letters.forEach((_, index) => {
+      [...letters].forEach((_, index) => {
         const typedLetter = typedLetters[index];
         const letter = letters[index];
         if (typedLetter) return;
-        if (letter.status === 'extra') {
+        if (mode === 'zen' || letter.status === 'extra') {
           letters.pop();
         } else {
           letter.typed = '';
@@ -110,13 +122,16 @@ const slice = createSlice({
       state.testWords[state.wordIndex] = {
         original: word.original,
         typed: trimmedValue,
-        isCorrect: word.original === trimmedValue,
+        isCorrect: mode === 'zen' || word.original === trimmedValue,
         letters,
       };
 
       if (!value) {
         state.inputValue = ' ';
         if (state.wordIndex > 0) {
+          if (!letters.length) {
+            state.testWords.splice(-1, 1);
+          }
           const previousIndex = state.wordIndex - 1;
           const previousWord = state.testWords[previousIndex];
           previousWord.letters.forEach((letter) => {
@@ -130,6 +145,9 @@ const slice = createSlice({
       } else if (value.endsWith(' ')) {
         state.inputValue = ' ';
         if (value.length > 2) {
+          if (mode === 'zen' && !state.testWords[state.wordIndex + 1]) {
+            state.testWords.push(emptyWord);
+          }
           let isError = false;
           state.testWords[state.wordIndex].letters.forEach((letter) => {
             if (!letter.typed) {
@@ -155,7 +173,7 @@ const slice = createSlice({
         const word = state.testWords[i];
         if (!word) continue;
         if (word.isCorrect) {
-          wpmText += ` ${word.typed}`;
+          wpmText += ` ${word.typed || ''}`;
         }
         rawText += ` ${word.typed || ''}`;
       }

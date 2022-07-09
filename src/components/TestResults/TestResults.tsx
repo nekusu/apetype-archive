@@ -58,7 +58,7 @@ function TestResults() {
         <StatGroup
           title={{ text: 'test type' }}
           values={[
-            { text: `${mode} ${mode === 'time' ? time : mode === 'words' ? words : null}` },
+            { text: `${mode} ${mode === 'time' ? time : mode === 'words' ? words : ''}` },
             { text: language },
           ]}
         />
