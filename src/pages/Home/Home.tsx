@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import uniqid from 'uniqid';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { TestResults, TestStats, TypingTest } from '../../components';
+import { Keymap, TestResults, TestStats, TypingTest } from '../../components';
 import { Button } from '../../components/ui';
 import { setTheme } from '../../slices/config';
 import { setIsFinished } from '../../slices/typingTest';
@@ -65,6 +65,7 @@ function Home() {
           : <Styled.Wrapper key={testId}>
             <TestStats />
             <TypingTest />
+            <Keymap />
           </Styled.Wrapper>
         }
       </AnimatePresence>
