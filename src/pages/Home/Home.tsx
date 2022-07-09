@@ -5,8 +5,8 @@ import { RiArrowRightSLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { TestResults, TestStats, TypingTest } from '../../components';
 import { Button } from '../../components/ui';
-import { setTheme } from '../../app/config.slice';
-import { setIsFinished } from '../../components/TypingTest/TypingTest.slice';
+import { setTheme } from '../../slices/config';
+import { setIsFinished } from '../../slices/typingTest';
 import themes from '../../themes/_list';
 import Styled from './Home.styles';
 

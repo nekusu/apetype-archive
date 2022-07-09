@@ -8,7 +8,7 @@ import {
   RiLoginCircleFill,
 } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { setMode, setTime, setWords } from '../../app/config.slice';
+import { setMode, setTime, setWords } from '../../slices/config';
 import { Button } from '../ui';
 import Styled from './Header.styles';
 

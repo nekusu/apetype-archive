@@ -12,7 +12,7 @@ import {
   setIsTyping,
   startTest,
   resetTest,
-} from './TypingTest.slice';
+} from '../../slices/typingTest';
 import Styled from './TypingTest.styles';
 import shuffleArray from '../../utils/shuffleArray';
 

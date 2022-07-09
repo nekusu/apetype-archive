@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { decrementTimer, endTest, setTimer, updateStats } from '../TypingTest/TypingTest.slice';
+import { decrementTimer, endTest, setTimer, updateStats } from '../../slices/typingTest';
 import Styled from './TestStats.styles';
 
 function TestStats() {

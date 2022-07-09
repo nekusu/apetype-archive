@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import configReducer from './config.slice';
-import typingTestReducer from '../components/TypingTest/TypingTest.slice';
+import configReducer from '../slices/config';
+import typingTestReducer from '../slices/typingTest';
 
 const store = configureStore({
   reducer: {
