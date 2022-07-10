@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Styled from './Keymap.styles';
 
 function Keymap() {
-  const [keys, setKeys] = useState(keymap);
+  const [keys, setKeys] = useState(chars.map((char) => ({ char, isActive: false })));
   const toggleActive = useCallback((e: KeyboardEvent) => {
     const keyIndex = keys.findIndex((k) => [...k.char].includes(e.key));
     if (keyIndex === -1) return;
@@ -37,9 +37,7 @@ function Keymap() {
           <Styled.Key key={char} $active={isActive} />
         ))}
       </Styled.Row>
-      <Styled.Row>
-        <Styled.Spacebar key={'space'} $active={!!keys.at(-1)?.isActive} />
-      </Styled.Row>
+      <Styled.Spacebar key={'space'} $active={!!keys.at(-1)?.isActive} />
     </Styled.Keymap>
   );
 }
@@ -50,6 +48,5 @@ const chars = [
   'Zz', 'Xx', 'Cc', 'Vv', 'Bb', 'Nn', 'Mm', ',<', '.>', '/?',
   ' ',
 ];
-const keymap = chars.map((char) => ({ char, isActive: false }));
 
 export default Keymap;

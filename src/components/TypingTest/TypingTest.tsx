@@ -2,10 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, useIsPresent } from 'framer-motion';
 import { RiCursorFill } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { Loading } from '../ui';
-import languages from '../../languages/_list';
 import {
-  setRawWords,
   addTestWords,
   checkInput,
   setIsReady,
@@ -19,9 +16,9 @@ function TypingTest() {
   const isPresent = useIsPresent();
   const dispatch = useAppDispatch();
   const config = useAppSelector(({ config }) => config);
-  const { mode, words, language } = config;
+  const { mode, words } = config;
   const {
-    rawWords,
+    testLanguage,
     testWords,
     wordIndex,
     inputValue,
@@ -31,6 +28,7 @@ function TypingTest() {
     isTestPopupOpen,
   } = useAppSelector(({ typingTest }) => typingTest);
   const [isFocused, setIsFocused] = useState(true);
+  const [isBlurred, setIsBlurred] = useState(false);
   const [caretPosition, setCaretPosition] = useState({ top: 2, left: 0 });
   const input = useRef<HTMLInputElement>(null);
   const wordsWrapper = useRef<HTMLDivElement>(null);
@@ -40,28 +38,31 @@ function TypingTest() {
   const typingTimeout = useRef<NodeJS.Timer>();
   const lastCaretTopPosition = useRef(2);
   const generateTestWords = useCallback((amount: number) => {
+    if (!testLanguage.words.length) return;
     const newTestWords: Set<string> = new Set();
     while (newTestWords.size < amount) {
-      newTestWords.add(rawWords[Math.floor(Math.random() * rawWords.length)]);
+      newTestWords.add(testLanguage.words[Math.floor(Math.random() * testLanguage.words.length)]);
     }
     dispatch(addTestWords([...newTestWords]));
-  }, [dispatch, rawWords]);
-  const focusWords = (e: KeyboardEvent | React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  }, [dispatch, testLanguage.words]);
+  const focusWords = (e?: KeyboardEvent | React.MouseEvent<HTMLDivElement>) => {
+    e?.preventDefault();
     clearTimeout(blurTimeout.current);
     input.current?.focus();
     setIsFocused(true);
+    setIsBlurred(false);
   };
   const blurWords = (e: React.FocusEvent<HTMLInputElement>) => {
     e.preventDefault();
     clearTimeout(blurTimeout.current);
-    blurTimeout.current = setTimeout(() => setIsFocused(false), 1000);
+    blurTimeout.current = setTimeout(() => setIsBlurred(true), 1000);
+    setIsFocused(false);
   };
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isReady) return;
     const { value } = e.target;
     if (!isRunning) {
-      dispatch(startTest());
+      dispatch(startTest(performance.now()));
     }
     dispatch(checkInput({ value, config }));
     dispatch(setIsTyping(true));
@@ -71,27 +72,30 @@ function TypingTest() {
 
   useEffect(() => {
     dispatch(resetTest());
-    input.current?.focus();
-    if (rawWords.length) {
-      if (mode === 'words' && words > 0) {
-        generateTestWords(Math.min(words, 50));
-      } else if (mode === 'time' || !words) {
-        generateTestWords(50);
-      } else if (mode === 'zen') {
-        dispatch(setIsReady(true));
-      }
-    } else {
-      (async () => {
-        const rawWords = await getRawWords(language);
-        dispatch(setRawWords(rawWords));
-      })();
-    }
-  }, [dispatch, mode, words, language, rawWords, generateTestWords]);
+  }, [dispatch]);
   useEffect(() => {
-    if (!isPresent) dispatch(setIsReady(false));
+    if (mode === 'words' && words > 0) {
+      generateTestWords(Math.min(words, 50));
+    } else if (mode === 'time' || !words) {
+      generateTestWords(50);
+    } else if (mode === 'zen') {
+      dispatch(setIsReady(true));
+    }
+  }, [dispatch, mode, words, generateTestWords]);
+  useEffect(() => {
+    if (!isPresent) {
+      dispatch(setIsReady(false));
+    }
   }, [dispatch, isPresent]);
   useEffect(() => {
-    if (!isTestPopupOpen && !isFocused) window.addEventListener('keydown', focusWords);
+    if (!isTestPopupOpen) {
+      focusWords();
+    }
+  }, [isTestPopupOpen]);
+  useEffect(() => {
+    if (!isTestPopupOpen && !isFocused) {
+      window.addEventListener('keydown', focusWords);
+    }
     return () => window.removeEventListener('keydown', focusWords);
   }, [isTestPopupOpen, isFocused]);
   useEffect(() => {
@@ -106,9 +110,7 @@ function TypingTest() {
     if (caretPosition.top > lastCaretTopPosition.current) {
       lastCaretTopPosition.current = caretPosition.top;
       if (mode === 'words' && words > 0) {
-        if (testWords.length < words) {
-          generateTestWords(Math.min(words - testWords.length, 12));
-        }
+        generateTestWords(Math.min(words - testWords.length, 12));
       } else if (mode === 'time' || !words) {
         generateTestWords(12);
       }
@@ -122,13 +124,14 @@ function TypingTest() {
         value={inputValue}
         onChange={handleInput}
         onBlur={blurWords}
+        autoFocus
       />
       <AnimatePresence>
         {isReady && (
           <Styled.Wrapper
             ref={wordsWrapper}
             onClick={focusWords}
-            $blurred={!isFocused}
+            $blurred={isBlurred}
           >
             {isFocused && (
               <Styled.Caret
@@ -163,9 +166,8 @@ function TypingTest() {
             </Styled.Words>
           </Styled.Wrapper>
         )}
-        {!rawWords.length && <Loading />}
       </AnimatePresence>
-      {isReady && !isFocused && (
+      {isReady && isBlurred && (
         <Styled.OutOfFocus>
           <RiCursorFill />
           Click or press any key to focus
@@ -174,12 +176,5 @@ function TypingTest() {
     </Styled.TypingTest>
   );
 }
-
-const languageURL = (lang: string) => `https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/${lang}.json`;
-const getRawWords = async (language: string = languages[0]) => {
-  const reponse = await fetch(languageURL(language));
-  const { words } = await reponse.json();
-  return words;
-};
 
 export default TypingTest;

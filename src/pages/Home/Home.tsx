@@ -5,19 +5,27 @@ import uniqid from 'uniqid';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Keymap, TestResults, TestStats, TypingTest } from '../../components';
-import { Button, Input, Popup } from '../../components/ui';
+import { Button, Input, Loading, Popup } from '../../components/ui';
 import { setTheme, setTime, setWords } from '../../slices/config';
-import { setIsFinished, setIsTestPopupOpen } from '../../slices/typingTest';
+import { setTestLanguage, setIsFinished, setIsTestPopupOpen } from '../../slices/typingTest';
 import themes from '../../themes/_list';
+import languages from '../../languages/_list';
 import Styled from './Home.styles';
 
 function Home() {
   const dispatch = useAppDispatch();
-  const { theme, randomTheme, mode, time, words } = useAppSelector(({ config }) => config);
-  const { isFinished, isTestPopupOpen } = useAppSelector(({ typingTest }) => typingTest);
+  const {
+    theme,
+    randomTheme,
+    mode,
+    time,
+    words,
+    language,
+  } = useAppSelector(({ config }) => config);
+  const { testLanguage, isFinished, isTestPopupOpen } = useAppSelector(({ typingTest }) => typingTest);
   const [id, setId] = useState(uniqid());
   const [testAmount, setTestAmount] = useState('0');
-  const testId = `${mode}-${mode === 'time' ? time : mode === 'words' ? words : ''}-${id}`;
+  const testId = `${mode}-${mode === 'time' ? time : mode === 'words' ? words : ''}-${language}-${id}`;
   const chooseRandomTheme = useCallback(async () => {
     if (randomTheme === 'off') return;
     let filteredThemes = themes;
@@ -53,50 +61,39 @@ function Home() {
     dispatch(setIsTestPopupOpen(false));
   };
 
-  let durationPreview = '';
-  if (!+testAmount) {
-    durationPreview = 'Infinite test';
-  } else if (+testAmount < 0) {
-    durationPreview = 'Error: invalid value';
-  } else if (+testAmount > 3600) {
-    durationPreview = 'Error: too long';
-  } else {
-    const date = new Date(+testAmount * 1000);
-    durationPreview = `Total time: ${formatDuration({
-      hours: date.getUTCHours(),
-      minutes: date.getUTCMinutes(),
-      seconds: date.getUTCSeconds(),
-    })}`;
-  }
-
+  useEffect(() => {
+    (async () => {
+      dispatch(setTestLanguage(await getLanguage(language)));
+    })();
+  }, [dispatch, language]);
   useEffect(() => {
     window.addEventListener('keydown', handleTab);
     return () => window.removeEventListener('keydown', handleTab);
   }, [handleTab]);
   useEffect(() => {
     setTestAmount(`${mode === 'time' ? time : words}`);
-  }, [mode, time, words]);
-  useEffect(() => {
     dispatch(setIsFinished(false));
   }, [dispatch, mode, time, words]);
 
   return (
     <Styled.Home>
       <AnimatePresence exitBeforeEnter>
-        {isFinished
-          ? <Styled.Wrapper key="result">
-            <TestResults />
-            <Styled.Buttons>
-              <Button alt title="Next test" onClick={restartTest}>
-                <RiArrowRightSLine />
-              </Button>
-            </Styled.Buttons>
-          </Styled.Wrapper>
-          : <Styled.Wrapper key={testId}>
-            <TestStats />
-            <TypingTest />
-            <Keymap />
-          </Styled.Wrapper>
+        {!testLanguage.words.length
+          ? <Loading />
+          : isFinished
+            ? <Styled.Wrapper key="result">
+              <TestResults />
+              <Styled.Buttons>
+                <Button alt title="Next test" onClick={restartTest}>
+                  <RiArrowRightSLine />
+                </Button>
+              </Styled.Buttons>
+            </Styled.Wrapper>
+            : <Styled.Wrapper key={testId}>
+              <TestStats />
+              <TypingTest />
+              <Keymap />
+            </Styled.Wrapper>
         }
       </AnimatePresence>
       <AnimatePresence>
@@ -105,7 +102,7 @@ function Home() {
             title={mode === 'time' ? 'Test duration' : 'Word amount'}
             closePopup={() => dispatch(setIsTestPopupOpen(false))}
           >
-            {mode === 'time' && durationPreview}
+            {mode === 'time' && getDurationPreview(+testAmount)}
             <Styled.Form onSubmit={handleSubmit}>
               <Input
                 type="number"
@@ -113,6 +110,7 @@ function Home() {
                 max={mode === 'time' ? '3600' : '5000'}
                 value={testAmount}
                 onChange={({ target: { value } }) => setTestAmount(value)}
+                autoFocus
               />
               <div>
                 You can start an infinite test by inputting 0.
@@ -126,5 +124,27 @@ function Home() {
     </Styled.Home>
   );
 }
+
+const languageURL = (lang: string) => `https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/${lang}.json`;
+const getLanguage = async (language: string = languages[0]) => {
+  const reponse = await fetch(languageURL(language));
+  const { name, words } = await reponse.json();
+  return { name, words };
+};
+const getDurationPreview = (seconds: number) => {
+  if (!seconds) {
+    return 'Infinite test';
+  } else if (seconds < 0) {
+    return 'Error: invalid value';
+  } else if (seconds > 3600) {
+    return 'Error: too long';
+  }
+  const date = new Date(seconds * 1000);
+  return `Total time: ${formatDuration({
+    hours: date.getUTCHours(),
+    minutes: date.getUTCMinutes(),
+    seconds: date.getUTCSeconds(),
+  })}`;
+};
 
 export default Home;

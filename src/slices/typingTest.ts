@@ -1,7 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface State {
-  rawWords: string[];
+  testLanguage: {
+    name: string;
+    words: string[];
+  },
   testWords: ApeTypes.Word[];
   wordIndex: number;
   inputValue: string;
@@ -26,7 +29,10 @@ interface State {
 }
 
 const initialState: State = {
-  rawWords: [],
+  testLanguage: {
+    name: '',
+    words: [],
+  },
   testWords: [],
   wordIndex: 0,
   inputValue: ' ',
@@ -54,8 +60,11 @@ const slice = createSlice({
   name: 'typingTest',
   initialState,
   reducers: {
-    setRawWords: (state, action: PayloadAction<string[]>) => {
-      state.rawWords = action.payload;
+    setTestLanguage: (state, action: PayloadAction<{ name: string, words: string[]; }>) => {
+      const { name, words } = action.payload;
+      if (name !== state.testLanguage.name) {
+        state.testLanguage = { name, words };
+      }
     },
     addTestWords: (state, action: PayloadAction<string[]>) => {
       const testWords = action.payload.map((word) => ({
@@ -165,7 +174,8 @@ const slice = createSlice({
         state.inputValue = value;
       }
     },
-    updateStats: (state) => {
+    updateStats: (state, action: PayloadAction<number>) => {
+      const timestamp = action.payload;
       const { stats } = state;
       let rawText = '';
       let wpmText = '';
@@ -179,7 +189,7 @@ const slice = createSlice({
       }
       wpmText = wpmText.trim();
       rawText = rawText.trim();
-      const elapsedTime = (performance.now() - state.startTime) / 1000;
+      const elapsedTime = (timestamp - state.startTime) / 1000;
       const characterCount = state.characterCount - stats.characterCount.reduce((a, b) => a + b, 0);
       const raw = characterCount / 5 / ((elapsedTime - state.elapsedTime) / 60);
       const wpm = wpmText.length / 5 / (elapsedTime / 60);
@@ -208,8 +218,9 @@ const slice = createSlice({
     setIsFinished: (state, action: PayloadAction<boolean>) => {
       state.isFinished = action.payload;
     },
-    startTest: (state) => {
-      state.startTime = performance.now();
+    startTest: (state, action: PayloadAction<number>) => {
+      const timestamp = action.payload;
+      state.startTime = timestamp;
       state.isRunning = true;
     },
     endTest: (state) => {
@@ -219,9 +230,9 @@ const slice = createSlice({
       state.isFinished = true;
     },
     resetTest: (state) => {
-      const { rawWords } = state;
+      const { testLanguage } = state;
       Object.assign(state, initialState);
-      state.rawWords = rawWords;
+      state.testLanguage = testLanguage;
     },
     setIsTestPopupOpen: (state, action: PayloadAction<boolean>) => {
       state.isTestPopupOpen = action.payload;
@@ -230,7 +241,7 @@ const slice = createSlice({
 });
 
 export const {
-  setRawWords,
+  setTestLanguage,
   addTestWords,
   checkInput,
   updateStats,

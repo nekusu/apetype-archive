@@ -19,11 +19,11 @@ function TestStats() {
   const intWpm = Math.floor(wpm);
   const absTimer = Math.abs(timer);
   const accuracy = (1 - errorCount / characterCount) * 100;
-  const intAccuracy = Math.floor(accuracy);
+  const intAccuracy = Math.floor(accuracy) || 0;
   const handleShiftEnter = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Enter' && e.shiftKey) {
       e.preventDefault();
-      dispatch(updateStats());
+      dispatch(updateStats(performance.now()));
       dispatch(endTest());
     }
   }, [dispatch]);
@@ -35,7 +35,7 @@ function TestStats() {
         dispatch(setTimer(time));
       }
       interval = setInterval(() => {
-        dispatch(updateStats());
+        dispatch(updateStats(performance.now()));
         if (mode === 'time') {
           dispatch(decrementTimer());
         }
@@ -47,7 +47,7 @@ function TestStats() {
     if (mode === 'time' && time > 0 && timer <= 0 ||
       mode === 'words' && words > 0 && wordIndex >= words) {
       if (mode !== 'time') {
-        dispatch(updateStats());
+        dispatch(updateStats(performance.now()));
       }
       dispatch(endTest());
     }
