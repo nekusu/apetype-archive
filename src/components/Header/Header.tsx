@@ -9,9 +9,9 @@ import {
   RiSettings4Fill,
 } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { setMode, setTime, setWords } from '../../slices/config';
 import { setIsTestPopupOpen } from '../../slices/typingTest';
 import { Button } from '../ui';
+import configList from '../../config/_list';
 import Styled from './Header.styles';
 
 function Header() {
@@ -20,11 +20,8 @@ function Header() {
   const { isTyping } = useAppSelector(({ typingTest }) => typingTest);
   const navigate = useNavigate();
   const location = useLocation();
-  const modes = ['time', 'words', 'zen'];
-  const timeAmount = [15, 30, 60, 120];
-  const wordAmount = [10, 25, 50, 100];
-  const setAmount = mode === 'time' ? setTime : setWords;
-  const amount = mode === 'time' ? timeAmount : wordAmount;
+  const { options: modes, action: setMode } = configList.mode;
+  const { options, action } = mode === 'time' ? configList.time : configList.words;
 
   return (
     <Styled.Header>
@@ -38,66 +35,63 @@ function Header() {
         </Styled.Text>
       </Styled.Logo>
       <AnimatePresence>
-        {!isTyping && (
-          <>
-            <Styled.Menu>
-              <Button text title="Home" navigate="/">
-                <RiKeyboardBoxFill />
-              </Button>
-              <Button text title="Leaderboards" navigate="/leaderboards">
-                <RiVipCrownFill />
-              </Button>
-              <Button text title="About" navigate="/about">
-                <RiInformationFill />
-              </Button>
-              <Button text title="Settings" navigate="/settings">
-                <RiSettingsFill />
-              </Button>
-              <Button text title="Login" navigate="/login">
-                <RiLoginCircleFill />
-              </Button>
-            </Styled.Menu>
-            {location.pathname === '/' && (
-              <Styled.Config>
+        {!isTyping && <>
+          <Styled.Menu>
+            <Button text title="Home" navigate="/">
+              <RiKeyboardBoxFill />
+            </Button>
+            <Button text title="Leaderboards" navigate="/leaderboards">
+              <RiVipCrownFill />
+            </Button>
+            <Button text title="About" navigate="/about">
+              <RiInformationFill />
+            </Button>
+            <Button text title="Settings" navigate="/settings">
+              <RiSettingsFill />
+            </Button>
+            <Button text title="Login" navigate="/login">
+              <RiLoginCircleFill />
+            </Button>
+          </Styled.Menu>
+          {location.pathname === '/' && (
+            <Styled.Config>
+              <Styled.ConfigGroup>
+                {modes.map((m) => (
+                  <Button
+                    key={m}
+                    onClick={() => dispatch(setMode(m as ApeTypes.Config['mode']))}
+                    text
+                    active={mode === m}
+                  >
+                    {m}
+                  </Button>
+                ))}
+              </Styled.ConfigGroup>
+              {(mode === 'time' || mode === 'words') && (
                 <Styled.ConfigGroup>
-                  {modes.map((m) => (
+                  {options.map((option) => (
                     <Button
-                      key={m}
-                      onClick={() => dispatch(setMode(m as ApeTypes.Config['mode']))}
+                      key={option}
+                      onClick={() => action && dispatch(action(option))}
                       text
-                      active={mode === m}
+                      active={mode === 'time' ? time === option : words === option}
                     >
-                      {m}
+                      {option}
                     </Button>
                   ))}
+                  <Button
+                    key="custom"
+                    onClick={() => dispatch(setIsTestPopupOpen(true))}
+                    text
+                    active={!options.includes(mode === 'time' ? time : words)}
+                  >
+                    <RiSettings4Fill />
+                  </Button>
                 </Styled.ConfigGroup>
-                {(mode === 'time' || mode === 'words') && (
-                  <Styled.ConfigGroup>
-                    {amount?.map((x) => (
-                      <Button
-                        key={x}
-                        onClick={() => setAmount && dispatch(setAmount(x))}
-                        text
-                        active={mode === 'time' && time === x ||
-                          mode === 'words' && words === x}
-                      >
-                        {x}
-                      </Button>
-                    ))}
-                    <Button
-                      onClick={() => dispatch(setIsTestPopupOpen(true))}
-                      text
-                      active={mode === 'time' && !timeAmount.includes(time) ||
-                        mode === 'words' && !wordAmount.includes(words)}
-                    >
-                      <RiSettings4Fill />
-                    </Button>
-                  </Styled.ConfigGroup>
-                )}
-              </Styled.Config>
-            )}
-          </>
-        )}
+              )}
+            </Styled.Config>
+          )}
+        </>}
       </AnimatePresence>
     </Styled.Header>
   );
