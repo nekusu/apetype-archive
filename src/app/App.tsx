@@ -4,7 +4,7 @@ import { AnimatePresence, domAnimation, LazyMotion, MotionConfig } from 'framer-
 import { ThemeProvider } from 'styled-components';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { setTheme } from '../slices/app';
-import { CommandLine, Header } from '../components';
+import { CommandLine, Header, Footer } from '../components';
 import { Home } from '../pages';
 import Styled, { GlobalStyle } from './App.styles';
 
@@ -36,6 +36,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                 </Routes>
               </AnimatePresence>
+              <Footer />
             </Styled.Content>
           </Styled.App>
         </MotionConfig>
