@@ -15,10 +15,16 @@ const slice = createSlice({
       state.mode = action.payload;
     },
     setTime: (state, action: PayloadAction<ApeTypes.Config['time']>) => {
-      state.time = action.payload;
+      const time = +action.payload;
+      if (!isNaN(time) && time < 3600) {
+        state.time = time;
+      }
     },
     setWords: (state, action: PayloadAction<ApeTypes.Config['words']>) => {
-      state.words = action.payload;
+      const words = +action.payload;
+      if (!isNaN(words) && words < 5000) {
+        state.words = words;
+      }
     },
     setLanguage: (state, action: PayloadAction<ApeTypes.Config['language']>) => {
       state.language = action.payload;

@@ -154,7 +154,8 @@ const slice = createSlice({
       } else if (value.endsWith(' ')) {
         state.inputValue = ' ';
         if (value.length > 2) {
-          if (mode === 'zen' && !state.testWords[state.wordIndex + 1]) {
+          const nextWord = state.testWords[state.wordIndex + 1];
+          if (mode === 'zen' && !nextWord) {
             state.testWords.push(emptyWord);
           }
           let isError = false;
@@ -167,7 +168,9 @@ const slice = createSlice({
           if (isError) {
             state.errorCount++;
           }
-          state.characterCount++;
+          if (mode === 'zen' || nextWord) {
+            state.characterCount++;
+          }
           state.wordIndex++;
         }
       } else {
@@ -189,7 +192,7 @@ const slice = createSlice({
       }
       wpmText = wpmText.trim();
       rawText = rawText.trim();
-      const elapsedTime = (timestamp - state.startTime) / 1000;
+      const elapsedTime = +((timestamp - state.startTime) / 1000).toFixed(2);
       const characterCount = state.characterCount - stats.characterCount.reduce((a, b) => a + b, 0);
       const raw = characterCount / 5 / ((elapsedTime - state.elapsedTime) / 60);
       const wpm = wpmText.length / 5 / (elapsedTime / 60);
@@ -220,7 +223,7 @@ const slice = createSlice({
     },
     startTest: (state, action: PayloadAction<number>) => {
       const timestamp = action.payload;
-      state.startTime = timestamp;
+      state.startTime = +timestamp.toFixed(2);
       state.isRunning = true;
     },
     endTest: (state) => {
