@@ -5,8 +5,9 @@ import useEventListener from 'use-typed-event-listener';
 import uniqid from 'uniqid';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { CommandLine, Keymap, TestResults, TestStats, TypingTest } from '../../components';
+import { Keymap, TestResults, TestStats, TypingTest } from '../../components';
 import { Button, Input, Loading, Popup } from '../../components/ui';
+import { setCommandLine } from '../../slices/app';
 import { setThemeName, setTime, setWords } from '../../slices/config';
 import { setTestLanguage, setIsFinished, setIsTestPopupOpen } from '../../slices/typingTest';
 import themes from '../../themes/_list';
@@ -15,6 +16,7 @@ import Styled from './Home.styles';
 
 function Home() {
   const dispatch = useAppDispatch();
+  const { commandLine } = useAppSelector(({ app }) => app);
   const {
     themeName,
     randomTheme,
@@ -25,7 +27,6 @@ function Home() {
   } = useAppSelector(({ config }) => config);
   const { testLanguage, isFinished, isTestPopupOpen } = useAppSelector(({ typingTest }) => typingTest);
   const [id, setId] = useState(uniqid());
-  const [isCommandLineOpen, setIsCommandLineOpen] = useState(false);
   const [customAmount, setCustomAmount] = useState('0');
   const testId = `${mode}-${mode === 'time' ? time : mode === 'words' ? words : ''}-${language}-${id}`;
   const chooseRandomTheme = async () => {
@@ -45,7 +46,7 @@ function Home() {
   const toggleCommandLine = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       e.preventDefault();
-      setIsCommandLineOpen(!isCommandLineOpen);
+      dispatch(setCommandLine({ isOpen: !commandLine.isOpen }));
       dispatch(setIsTestPopupOpen(false));
     }
   };
@@ -66,7 +67,7 @@ function Home() {
   };
 
   useEventListener(
-    !isCommandLineOpen && !isTestPopupOpen ? window : null,
+    !commandLine.isOpen && !isTestPopupOpen ? window : null,
     'keydown',
     handleTab,
   );
@@ -100,18 +101,12 @@ function Home() {
             </Styled.Wrapper>
             : <Styled.Wrapper key={testId}>
               <TestStats />
-              <TypingTest isCommandLineOpen={isCommandLineOpen} />
+              <TypingTest />
               <Keymap />
             </Styled.Wrapper>
         }
       </AnimatePresence>
       <AnimatePresence exitBeforeEnter>
-        {isCommandLineOpen && (
-          <CommandLine
-            key="command-line"
-            close={() => setIsCommandLineOpen(false)}
-          />
-        )}
         {isTestPopupOpen && (
           <Popup close={() => dispatch(setIsTestPopupOpen(false))}>
             <Styled.CustomConfig>

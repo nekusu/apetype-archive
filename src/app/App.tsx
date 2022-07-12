@@ -4,13 +4,13 @@ import { AnimatePresence, domAnimation, LazyMotion, MotionConfig } from 'framer-
 import { ThemeProvider } from 'styled-components';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { setTheme } from '../slices/app';
-import { Header } from '../components';
+import { CommandLine, Header } from '../components';
 import { Home } from '../pages';
 import Styled, { GlobalStyle } from './App.styles';
 
 function App() {
   const dispatch = useAppDispatch();
-  const { theme } = useAppSelector(({ app }) => app);
+  const { theme, commandLine } = useAppSelector(({ app }) => app);
   const { themeName } = useAppSelector(({ config }) => config);
   const location = useLocation();
 
@@ -27,6 +27,9 @@ function App() {
           <GlobalStyle />
           <Styled.App>
             <Styled.Content>
+              <AnimatePresence>
+                {commandLine.isOpen && <CommandLine />}
+              </AnimatePresence>
               <Header />
               <AnimatePresence exitBeforeEnter>
                 <Routes location={location} key={location.pathname}>

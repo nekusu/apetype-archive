@@ -1,28 +1,37 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useIsPresent } from 'framer-motion';
 import { RiTerminalLine, RiCheckLine, RiSettingsLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { setTheme } from '../../slices/app';
+import { setTheme, setCommandLine } from '../../slices/app';
 import { Button, Popup } from '../ui';
 import configList from '../../config/_list';
 import themes from '../../themes/_list';
 import Styled from './CommandLine.styles';
 
-interface Props {
-  initial?: string;
-  close: () => void;
-}
-
-function CommandLine({ initial = '', close }: Props) {
+function CommandLine() {
   const dispatch = useAppDispatch();
+  const { commandLine } = useAppSelector(({ app }) => app);
   const config = useAppSelector(({ config }) => config);
   const [inputValue, setInputValue] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
-  const [selected, setSelected] = useState(initial);
+  const [selected, setSelected] = useState(commandLine.initial);
   const [configItems, setConfigItems] = useState(Object.entries(configList));
   const [selectedOptions, setSelectedOptions] = useState(configList[selected]?.options || []);
+  const isPresent = useIsPresent();
   const input = useRef<HTMLInputElement>(null);
   const listItem = useRef<HTMLDivElement>(null);
   const selectedConfig = config[selected as keyof typeof config];
+  const deleteCommand = async () => {
+    if (selected === 'themeName') {
+      dispatch(setTheme((await import(`../../themes/${config.themeName}.ts`)).default));
+    }
+    setSelected('');
+  };
+  const changeConfig = (option: string | number) => {
+    input.current?.focus();
+    dispatch(configList[selected].action(option));
+    setInputValue('');
+  };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const isCustom = !!configItems.find(([key]) => key === selected)?.[1].custom;
     const maxIndex = selected
@@ -40,18 +49,14 @@ function CommandLine({ initial = '', close }: Props) {
       listItem.current?.click();
     }
   };
-  const deleteCommand = async () => {
-    if (selected === 'themeName') {
-      dispatch(setTheme((await import(`../../themes/${config.themeName}.ts`)).default));
-    }
-    setSelected('');
-  };
-  const changeConfig = (option: string | number) => {
-    input.current?.focus();
-    dispatch(configList[selected].action(option));
-    setInputValue('');
-  };
 
+  useEffect(() => {
+    if (selected === 'themeName' && !isPresent) {
+      (async () => {
+        dispatch(setTheme((await import(`../../themes/${config.themeName}.ts`)).default));
+      })();
+    }
+  }, [dispatch, config.themeName, selected, isPresent]);
   useLayoutEffect(() => {
     const value = inputValue.replace(/[^a-zA-Z0-9\s_]+/gi, '');
     const regex = new RegExp(value.trim(), 'gi');
@@ -88,7 +93,7 @@ function CommandLine({ initial = '', close }: Props) {
   }, [dispatch, activeIndex, selected]);
 
   return (
-    <Popup top maxWidth={700} close={close}>
+    <Popup top maxWidth={700} close={() => dispatch(setCommandLine({ isOpen: false }))}>
       <Styled.SearchBar onKeyDown={handleKeyDown}>
         <RiTerminalLine />
         {selected && (

@@ -14,13 +14,9 @@ import {
 } from '../../slices/typingTest';
 import Styled from './TypingTest.styles';
 
-interface Props {
-  isCommandLineOpen: boolean;
-}
-
-function TypingTest({ isCommandLineOpen }: Props) {
-  const isPresent = useIsPresent();
+function TypingTest() {
   const dispatch = useAppDispatch();
+  const { commandLine } = useAppSelector(({ app }) => app);
   const config = useAppSelector(({ config }) => config);
   const { mode, words } = config;
   const {
@@ -36,6 +32,7 @@ function TypingTest({ isCommandLineOpen }: Props) {
   const [isFocused, setIsFocused] = useState(false);
   const [isBlurred, setIsBlurred] = useState(true);
   const [caretPosition, setCaretPosition] = useState({ top: 2, left: 0 });
+  const isPresent = useIsPresent();
   const input = useRef<HTMLInputElement>(null);
   const wordsWrapper = useRef<HTMLDivElement>(null);
   const currentWord = useRef<HTMLDivElement>(null);
@@ -81,7 +78,7 @@ function TypingTest({ isCommandLineOpen }: Props) {
   };
 
   useEventListener(
-    !isCommandLineOpen && !isTestPopupOpen && !isFocused ? window : null,
+    !commandLine.isOpen && !isTestPopupOpen && !isFocused ? window : null,
     'keydown',
     handleKeyDown,
   );
@@ -101,10 +98,10 @@ function TypingTest({ isCommandLineOpen }: Props) {
     }
   }, [dispatch, isPresent]);
   useEffect(() => {
-    if (!isCommandLineOpen && !isTestPopupOpen) {
+    if (!commandLine.isOpen && !isTestPopupOpen) {
       focusWords();
     }
-  }, [isCommandLineOpen, isTestPopupOpen]);
+  }, [commandLine.isOpen, isTestPopupOpen]);
   useEffect(() => {
     const top = currentWord.current?.offsetTop || 2;
     const left = currentLetter.current
