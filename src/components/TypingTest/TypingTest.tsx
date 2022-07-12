@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, useIsPresent } from 'framer-motion';
 import { RiCursorFill } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
@@ -12,7 +13,11 @@ import {
 } from '../../slices/typingTest';
 import Styled from './TypingTest.styles';
 
-function TypingTest() {
+interface Props {
+  isCommandLineOpen: boolean;
+}
+
+function TypingTest({ isCommandLineOpen }: Props) {
   const isPresent = useIsPresent();
   const dispatch = useAppDispatch();
   const config = useAppSelector(({ config }) => config);
@@ -27,8 +32,8 @@ function TypingTest() {
     isTyping,
     isTestPopupOpen,
   } = useAppSelector(({ typingTest }) => typingTest);
-  const [isFocused, setIsFocused] = useState(true);
-  const [isBlurred, setIsBlurred] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isBlurred, setIsBlurred] = useState(true);
   const [caretPosition, setCaretPosition] = useState({ top: 2, left: 0 });
   const input = useRef<HTMLInputElement>(null);
   const wordsWrapper = useRef<HTMLDivElement>(null);
@@ -37,16 +42,15 @@ function TypingTest() {
   const blurTimeout = useRef<NodeJS.Timer>();
   const typingTimeout = useRef<NodeJS.Timer>();
   const lastCaretTopPosition = useRef(2);
-  const generateTestWords = useCallback((amount: number) => {
+  const generateTestWords = (amount: number) => {
     if (!testLanguage.words.length) return;
     const newTestWords: Set<string> = new Set();
     while (newTestWords.size < amount) {
       newTestWords.add(testLanguage.words[Math.floor(Math.random() * testLanguage.words.length)]);
     }
     dispatch(addTestWords([...newTestWords]));
-  }, [dispatch, testLanguage.words]);
-  const focusWords = (e?: KeyboardEvent | React.MouseEvent<HTMLDivElement>) => {
-    e?.preventDefault();
+  };
+  const focusWords = () => {
     clearTimeout(blurTimeout.current);
     input.current?.focus();
     setIsFocused(true);
@@ -72,8 +76,6 @@ function TypingTest() {
 
   useEffect(() => {
     dispatch(resetTest());
-  }, [dispatch]);
-  useEffect(() => {
     if (mode === 'words' && words > 0) {
       generateTestWords(Math.min(words, 50));
     } else if (mode === 'time' || !words) {
@@ -81,23 +83,28 @@ function TypingTest() {
     } else if (mode === 'zen') {
       dispatch(setIsReady(true));
     }
-  }, [dispatch, mode, words, generateTestWords]);
+  }, [dispatch]);
   useEffect(() => {
     if (!isPresent) {
       dispatch(setIsReady(false));
     }
   }, [dispatch, isPresent]);
   useEffect(() => {
-    if (!isTestPopupOpen) {
+    if (!isCommandLineOpen && !isTestPopupOpen) {
       focusWords();
     }
-  }, [isTestPopupOpen]);
+  }, [isCommandLineOpen, isTestPopupOpen]);
   useEffect(() => {
-    if (!isTestPopupOpen && !isFocused) {
-      window.addEventListener('keydown', focusWords);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab' || e.key === 'Escape' || e.key.match(/F\d*/)) return;
+      e.preventDefault();
+      focusWords();
+    };
+    if (!isCommandLineOpen && !isTestPopupOpen && !isFocused) {
+      window.addEventListener('keydown', handleKeyDown);
     }
-    return () => window.removeEventListener('keydown', focusWords);
-  }, [isTestPopupOpen, isFocused]);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isCommandLineOpen, isTestPopupOpen, isFocused]);
   useEffect(() => {
     const top = currentWord.current?.offsetTop || 2;
     const left = currentLetter.current
@@ -115,7 +122,7 @@ function TypingTest() {
         generateTestWords(12);
       }
     }
-  }, [mode, words, testWords, caretPosition.top, generateTestWords]);
+  }, [testWords, caretPosition.top]);
 
   return (
     <Styled.TypingTest>
@@ -124,7 +131,6 @@ function TypingTest() {
         value={inputValue}
         onChange={handleInput}
         onBlur={blurWords}
-        autoFocus
       />
       <AnimatePresence>
         {isReady && (

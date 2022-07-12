@@ -4,7 +4,7 @@ import { formatDuration } from 'date-fns';
 import uniqid from 'uniqid';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { Keymap, TestResults, TestStats, TypingTest } from '../../components';
+import { CommandLine, Keymap, TestResults, TestStats, TypingTest } from '../../components';
 import { Button, Input, Loading, Popup } from '../../components/ui';
 import { setThemeName, setTime, setWords } from '../../slices/config';
 import { setTestLanguage, setIsFinished, setIsTestPopupOpen } from '../../slices/typingTest';
@@ -24,7 +24,8 @@ function Home() {
   } = useAppSelector(({ config }) => config);
   const { testLanguage, isFinished, isTestPopupOpen } = useAppSelector(({ typingTest }) => typingTest);
   const [id, setId] = useState(uniqid());
-  const [testAmount, setTestAmount] = useState('0');
+  const [isCommandLineOpen, setIsCommandLineOpen] = useState(false);
+  const [customAmount, setCustomAmount] = useState('0');
   const testId = `${mode}-${mode === 'time' ? time : mode === 'words' ? words : ''}-${language}-${id}`;
   const chooseRandomTheme = useCallback(async () => {
     if (randomTheme === 'off') return;
@@ -40,18 +41,12 @@ function Home() {
     chooseRandomTheme();
     dispatch(setIsFinished(false));
   }, [chooseRandomTheme, dispatch]);
-  const handleTab = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      restartTest();
-    }
-  }, [restartTest]);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (mode === 'time') {
-      dispatch(setTime(+testAmount));
+      dispatch(setTime(+customAmount));
     } else {
-      dispatch(setWords(+testAmount));
+      dispatch(setWords(+customAmount));
     }
     dispatch(setIsTestPopupOpen(false));
   };
@@ -65,13 +60,32 @@ function Home() {
     })();
   }, [dispatch, language]);
   useEffect(() => {
-    window.addEventListener('keydown', handleTab);
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        restartTest();
+      }
+    };
+    if (!isCommandLineOpen && !isTestPopupOpen) {
+      window.addEventListener('keydown', handleTab);
+    }
     return () => window.removeEventListener('keydown', handleTab);
-  }, [handleTab]);
+  }, [isCommandLineOpen, isTestPopupOpen, restartTest]);
   useEffect(() => {
-    setTestAmount(`${mode === 'time' ? time : words}`);
+    const toggleCommandLine = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setIsCommandLineOpen(!isCommandLineOpen);
+        dispatch(setIsTestPopupOpen(false));
+      }
+    };
+    window.addEventListener('keydown', toggleCommandLine);
+    return () => window.removeEventListener('keydown', toggleCommandLine);
+  }, [dispatch, isCommandLineOpen]);
+  useEffect(() => {
+    setCustomAmount(`${mode === 'time' ? time : words}`);
     dispatch(setIsFinished(false));
-  }, [dispatch, mode, time, words]);
+  }, [dispatch, mode, time, words, language]);
 
   return (
     <Styled.Home>
@@ -89,12 +103,18 @@ function Home() {
             </Styled.Wrapper>
             : <Styled.Wrapper key={testId}>
               <TestStats />
-              <TypingTest />
+              <TypingTest isCommandLineOpen={isCommandLineOpen} />
               <Keymap />
             </Styled.Wrapper>
         }
       </AnimatePresence>
-      <AnimatePresence>
+      <AnimatePresence exitBeforeEnter>
+        {isCommandLineOpen && (
+          <CommandLine
+            key="command-line"
+            close={() => setIsCommandLineOpen(false)}
+          />
+        )}
         {isTestPopupOpen && (
           <Popup close={() => dispatch(setIsTestPopupOpen(false))}>
             <Styled.CustomConfig>
