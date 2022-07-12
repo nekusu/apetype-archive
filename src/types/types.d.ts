@@ -1,17 +1,11 @@
 declare namespace ApeTypes {
   interface Config {
-    theme: Theme;
-    randomTheme: 'off' | 'on' | 'light' | 'dark';
     mode: 'time' | 'words' | 'zen';
     time: number;
     words: number;
     language: string;
-  }
-
-  interface Theme {
-    name: string;
-    mode: 'light' | 'dark';
-    colors: DefaultTheme;
+    themeName: string;
+    randomTheme: 'off' | 'on' | 'light' | 'dark';
   }
 
   interface Letter {

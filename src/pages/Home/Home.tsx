@@ -6,7 +6,7 @@ import { RiArrowRightSLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Keymap, TestResults, TestStats, TypingTest } from '../../components';
 import { Button, Input, Loading, Popup } from '../../components/ui';
-import { setTheme, setTime, setWords } from '../../slices/config';
+import { setThemeName, setTime, setWords } from '../../slices/config';
 import { setTestLanguage, setIsFinished, setIsTestPopupOpen } from '../../slices/typingTest';
 import themes from '../../themes/_list';
 import languages from '../../languages/_list';
@@ -15,7 +15,7 @@ import Styled from './Home.styles';
 function Home() {
   const dispatch = useAppDispatch();
   const {
-    theme,
+    themeName,
     randomTheme,
     mode,
     time,
@@ -30,16 +30,11 @@ function Home() {
     if (randomTheme === 'off') return;
     let filteredThemes = themes;
     if (randomTheme === 'light' || randomTheme === 'dark') {
-      filteredThemes = themes.filter((t) => t.mode === randomTheme && t.name !== theme.name);
+      filteredThemes = themes.filter((t) => t.mode === randomTheme && t.name !== themeName);
     }
     const newTheme = filteredThemes[Math.floor(Math.random() * filteredThemes.length)];
-    const colors = (await import(`../../themes/${newTheme.name}.ts`)).default;
-    dispatch(setTheme({
-      name: newTheme.name,
-      mode: newTheme.mode,
-      colors,
-    }));
-  }, [dispatch, theme, randomTheme]);
+    dispatch(setThemeName(newTheme.name));
+  }, [dispatch, randomTheme, themeName]);
   const restartTest = useCallback(() => {
     setId(uniqid());
     chooseRandomTheme();
@@ -61,6 +56,9 @@ function Home() {
     dispatch(setIsTestPopupOpen(false));
   };
 
+  useEffect(() => {
+    dispatch(setThemeName(themeName));
+  }, [dispatch, themeName]);
   useEffect(() => {
     (async () => {
       dispatch(setTestLanguage(await getLanguage(language)));

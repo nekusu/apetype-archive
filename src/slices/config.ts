@@ -1,27 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import defaultColors from '../themes/aurora';
 
 const slice = createSlice({
   name: 'config',
   initialState: {
-    theme: {
-      name: 'aurora',
-      mode: 'dark',
-      colors: defaultColors,
-    },
-    randomTheme: 'dark',
     mode: 'time',
     time: 15,
     words: 10,
     language: 'english',
+    themeName: 'aurora',
+    randomTheme: 'dark',
   } as ApeTypes.Config,
   reducers: {
-    setTheme: (state, action: PayloadAction<ApeTypes.Config['theme']>) => {
-      state.theme = action.payload;
-    },
-    setRandomTheme: (state, action: PayloadAction<ApeTypes.Config['randomTheme']>) => {
-      state.randomTheme = action.payload;
-    },
     setMode: (state, action: PayloadAction<ApeTypes.Config['mode']>) => {
       state.mode = action.payload;
     },
@@ -34,15 +23,21 @@ const slice = createSlice({
     setLanguage: (state, action: PayloadAction<ApeTypes.Config['language']>) => {
       state.language = action.payload;
     },
+    setThemeName: (state, action: PayloadAction<ApeTypes.Config['themeName']>) => {
+      state.themeName = action.payload;
+    },
+    setRandomTheme: (state, action: PayloadAction<ApeTypes.Config['randomTheme']>) => {
+      state.randomTheme = action.payload;
+    },
   },
 });
 
 export const {
-  setTheme,
-  setRandomTheme,
   setMode,
   setTime,
   setWords,
   setLanguage,
+  setThemeName,
+  setRandomTheme,
 } = slice.actions;
 export default slice.reducer;
