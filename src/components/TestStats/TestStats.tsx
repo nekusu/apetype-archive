@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import useEventListener from 'use-typed-event-listener';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { decrementTimer, endTest, setTimer, updateStats } from '../../slices/typingTest';
 import { accuracy as acc } from '../../utils';
@@ -30,6 +31,11 @@ function TestStats() {
     }
   };
 
+  useEventListener(
+    isRunning && (mode === 'zen' || !time || !words) ? window : null,
+    'keydown',
+    handleShiftEnter,
+  );
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isRunning) {
@@ -54,12 +60,6 @@ function TestStats() {
       dispatch(endTest());
     }
   }, [timer, wordIndex]);
-  useEffect(() => {
-    if (isRunning && (mode === 'zen' || !time || !words)) {
-      window.addEventListener('keydown', handleShiftEnter);
-    }
-    return () => window.removeEventListener('keydown', handleShiftEnter);
-  }, [handleShiftEnter, isRunning]);
 
   return (
     <Styled.Wrapper>

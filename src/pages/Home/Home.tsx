@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { formatDuration } from 'date-fns';
+import useEventListener from 'use-typed-event-listener';
 import uniqid from 'uniqid';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
@@ -27,7 +28,7 @@ function Home() {
   const [isCommandLineOpen, setIsCommandLineOpen] = useState(false);
   const [customAmount, setCustomAmount] = useState('0');
   const testId = `${mode}-${mode === 'time' ? time : mode === 'words' ? words : ''}-${language}-${id}`;
-  const chooseRandomTheme = useCallback(async () => {
+  const chooseRandomTheme = async () => {
     if (randomTheme === 'off') return;
     let filteredThemes = themes;
     if (randomTheme === 'light' || randomTheme === 'dark') {
@@ -35,12 +36,25 @@ function Home() {
     }
     const newTheme = filteredThemes[Math.floor(Math.random() * filteredThemes.length)];
     dispatch(setThemeName(newTheme.name));
-  }, [dispatch, randomTheme, themeName]);
-  const restartTest = useCallback(() => {
+  };
+  const restartTest = () => {
     setId(uniqid());
     chooseRandomTheme();
     dispatch(setIsFinished(false));
-  }, [chooseRandomTheme, dispatch]);
+  };
+  const toggleCommandLine = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setIsCommandLineOpen(!isCommandLineOpen);
+      dispatch(setIsTestPopupOpen(false));
+    }
+  };
+  const handleTab = (e: KeyboardEvent) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      restartTest();
+    }
+  };
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (mode === 'time') {
@@ -51,6 +65,12 @@ function Home() {
     dispatch(setIsTestPopupOpen(false));
   };
 
+  useEventListener(
+    !isCommandLineOpen && !isTestPopupOpen ? window : null,
+    'keydown',
+    handleTab,
+  );
+  useEventListener(window, 'keydown', toggleCommandLine);
   useEffect(() => {
     dispatch(setThemeName(themeName));
   }, [dispatch, themeName]);
@@ -59,29 +79,6 @@ function Home() {
       dispatch(setTestLanguage(await getLanguage(language)));
     })();
   }, [dispatch, language]);
-  useEffect(() => {
-    const handleTab = (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
-        e.preventDefault();
-        restartTest();
-      }
-    };
-    if (!isCommandLineOpen && !isTestPopupOpen) {
-      window.addEventListener('keydown', handleTab);
-    }
-    return () => window.removeEventListener('keydown', handleTab);
-  }, [isCommandLineOpen, isTestPopupOpen, restartTest]);
-  useEffect(() => {
-    const toggleCommandLine = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        setIsCommandLineOpen(!isCommandLineOpen);
-        dispatch(setIsTestPopupOpen(false));
-      }
-    };
-    window.addEventListener('keydown', toggleCommandLine);
-    return () => window.removeEventListener('keydown', toggleCommandLine);
-  }, [dispatch, isCommandLineOpen]);
   useEffect(() => {
     setCustomAmount(`${mode === 'time' ? time : words}`);
     dispatch(setIsFinished(false));

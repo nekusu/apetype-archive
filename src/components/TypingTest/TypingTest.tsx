@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, useIsPresent } from 'framer-motion';
+import useEventListener from 'use-typed-event-listener';
 import { RiCursorFill } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import {
@@ -62,6 +63,11 @@ function TypingTest({ isCommandLineOpen }: Props) {
     blurTimeout.current = setTimeout(() => setIsBlurred(true), 1000);
     setIsFocused(false);
   };
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Tab' || e.key === 'Escape' || e.key.match(/F\d*/)) return;
+    e.preventDefault();
+    focusWords();
+  };
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isReady) return;
     const { value } = e.target;
@@ -74,6 +80,11 @@ function TypingTest({ isCommandLineOpen }: Props) {
     typingTimeout.current = setTimeout(() => dispatch(setIsTyping(false)), 1000);
   };
 
+  useEventListener(
+    !isCommandLineOpen && !isTestPopupOpen && !isFocused ? window : null,
+    'keydown',
+    handleKeyDown,
+  );
   useEffect(() => {
     dispatch(resetTest());
     if (mode === 'words' && words > 0) {
@@ -94,17 +105,6 @@ function TypingTest({ isCommandLineOpen }: Props) {
       focusWords();
     }
   }, [isCommandLineOpen, isTestPopupOpen]);
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Tab' || e.key === 'Escape' || e.key.match(/F\d*/)) return;
-      e.preventDefault();
-      focusWords();
-    };
-    if (!isCommandLineOpen && !isTestPopupOpen && !isFocused) {
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCommandLineOpen, isTestPopupOpen, isFocused]);
   useEffect(() => {
     const top = currentWord.current?.offsetTop || 2;
     const left = currentLetter.current

@@ -1,24 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
+import useEventListener from 'use-typed-event-listener';
 import Styled from './Keymap.styles';
 
 function Keymap() {
   const [keys, setKeys] = useState(chars.map((char) => ({ char, isActive: false })));
-  const toggleActive = useCallback((e: KeyboardEvent) => {
+  const toggleActive = (e: KeyboardEvent) => {
     const keyIndex = keys.findIndex((k) => [...k.char].includes(e.key));
     if (keyIndex === -1) return;
     const newKeys = [...keys];
     newKeys[keyIndex].isActive = e.type === 'keydown';
     setKeys(newKeys);
-  }, [keys]);
+  };
 
-  useEffect(() => {
-    window.addEventListener('keydown', toggleActive);
-    window.addEventListener('keyup', toggleActive);
-    return () => {
-      window.removeEventListener('keydown', toggleActive);
-      window.removeEventListener('keyup', toggleActive);
-    };
-  }, [toggleActive]);
+  useEventListener(window, 'keydown', toggleActive);
+  useEventListener(window, 'keyup', toggleActive);
 
   return (
     <Styled.Keymap>
