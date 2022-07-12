@@ -4,5 +4,4 @@ export { default as Header } from './Header/Header';
 export { default as Keymap } from './Keymap/Keymap';
 export { default as TestResults } from './TestResults/TestResults';
 export { default as TestStats } from './TestStats/TestStats';
-export { default as ThemeProvider } from './ThemeProvider/ThemeProvider';
 export { default as TypingTest } from './TypingTest/TypingTest';
