@@ -1,27 +1,39 @@
-import Styled from './Button.styles';
-import { HTMLMotionProps } from 'framer-motion';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Styled from './Button.styles';
 
-interface Props extends HTMLMotionProps<'button'> {
+interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   active?: boolean;
   text?: boolean;
   alt?: boolean;
   navigate?: string;
+  href?: string;
 }
 
-function Button({ children, active, text, alt, navigate: to, onClick, ...rest }: Props) {
+function Button({
+  children,
+  active,
+  text,
+  alt,
+  navigate: to,
+  href,
+  onClick,
+  ...rest
+}: Props) {
   const StyledButton = text ? Styled.TextButton : alt ? Styled.AltButton : Styled.Button;
   const navigate = useNavigate();
 
   return (
     <StyledButton
-      onClick={(e) => {
+      as={href ? 'a' : 'button'}
+      href={href}
+      target={href ? '_blank' : undefined}
+      rel={href ? 'noopener noreferrer' : undefined}
+      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(e);
         to && navigate(to);
       }}
-      whileTap={{ scale: text ? 1 : 0.925 }}
-      transition={{ duration: 0.15 }}
       $active={active}
       {...rest}
     >

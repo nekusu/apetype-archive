@@ -1,9 +1,6 @@
 import styled from 'styled-components';
-import { m } from 'framer-motion';
 
-const Button = styled(m.button).attrs((props) => ({
-  type: props.type || 'button',
-})) <{ $active?: boolean; }>`
+const Button = styled.button<{ $active?: boolean; }>`
   padding: 8px;
   display: flex;
   align-items: center;
@@ -16,11 +13,14 @@ const Button = styled(m.button).attrs((props) => ({
   border-radius: 8px;
   user-select: none;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
 
   &:hover {
     background: ${p => p.theme.text};
     color: ${p => p.theme.bg};
+  }
+  &:active {
+    transform: scale(0.925);
   }
 `;
 
@@ -32,6 +32,9 @@ const TextButton = styled(Button) <{ $active?: boolean; }>`
 
   &:hover {
     color: ${p => p.theme.text};
+  }
+  &:active {
+    transform: none;
   }
 `;
 
