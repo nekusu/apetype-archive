@@ -13,10 +13,19 @@ const Home = styled(m.div).attrs(() => ({
   flex: 1;
 `;
 
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+const CustomConfig = styled.div`
+  padding: 24px;
+
+  h4 {
+    font-size: 24px;
+    font-weight: 400;
+  }
+
+  &, form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 `;
 
 const Wrapper = styled(m.div).attrs(() => ({
@@ -43,7 +52,7 @@ const Buttons = styled.div`
 
 const Styled = {
   Home,
-  Form,
+  CustomConfig,
   Wrapper,
   Buttons,
 };

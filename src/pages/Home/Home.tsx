@@ -98,26 +98,24 @@ function Home() {
       </AnimatePresence>
       <AnimatePresence>
         {isTestPopupOpen && (
-          <Popup
-            title={mode === 'time' ? 'Test duration' : 'Word amount'}
-            closePopup={() => dispatch(setIsTestPopupOpen(false))}
-          >
-            {mode === 'time' && getDurationPreview(+testAmount)}
-            <Styled.Form onSubmit={handleSubmit}>
-              <Input
-                type="number"
-                min="0"
-                max={mode === 'time' ? '3600' : '5000'}
-                value={testAmount}
-                onChange={({ target: { value } }) => setTestAmount(value)}
-                autoFocus
-              />
-              <div>
+          <Popup close={() => dispatch(setIsTestPopupOpen(false))}>
+            <Styled.CustomConfig>
+              <h4>{mode === 'time' ? 'Test duration' : 'Word amount'}</h4>
+              {mode === 'time' && getDurationPreview(+customAmount)}
+              <form onSubmit={handleSubmit}>
+                <Input
+                  type="number"
+                  min="0"
+                  max={mode === 'time' ? '3600' : '5000'}
+                  value={customAmount}
+                  onChange={({ target: { value } }) => setCustomAmount(value)}
+                  autoFocus
+                />
                 You can start an infinite test by inputting 0.
                 To stop the test, use shift + enter.
-              </div>
-              <Button type="submit">ok</Button>
-            </Styled.Form>
+                <Button type="submit">ok</Button>
+              </form>
+            </Styled.CustomConfig>
           </Popup>
         )}
       </AnimatePresence>

@@ -2,21 +2,15 @@ import Styled from './Popup.styles';
 
 interface Props {
   children: React.ReactNode;
+  top?: boolean;
   maxWidth?: number;
-  padding?: number;
-  title: string;
-  closePopup: () => void;
+  close: () => void;
 }
 
-function Popup({ children, maxWidth, padding, title, closePopup }: Props) {
+function Popup({ children, top, maxWidth, close }: Props) {
   return (
-    <Styled.Wrapper onClick={closePopup}>
-      <Styled.Popup
-        $maxWidth={maxWidth}
-        $padding={padding}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {title && <Styled.Title>{title}</Styled.Title>}
+    <Styled.Wrapper onClick={close} $top={top}>
+      <Styled.Popup onClick={(e) => e.stopPropagation()} $maxWidth={maxWidth}>
         {children}
       </Styled.Popup>
     </Styled.Wrapper>
