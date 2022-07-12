@@ -1,7 +1,7 @@
 import { useAppSelector } from '../../app/hooks';
 import { Chart } from '../index';
 import { StatGroup } from '../ui';
-import kogasa from '../../utils/kogasa';
+import { accuracy as acc, kogasa } from '../../utils';
 import Styled from './TestResults.styles';
 
 function TestResults() {
@@ -17,7 +17,8 @@ function TestResults() {
   } = useAppSelector(({ typingTest }) => typingTest);
   const intRaw = Math.floor(raw);
   const intWpm = Math.floor(wpm);
-  const accuracy = Math.floor((1 - errorCount / characterCount) * 100);
+  const accuracy = acc(errorCount, characterCount);
+  const intAccuracy = Math.floor(accuracy);
   const consistency = kogasa(stats.raw);
   const intConsistency = Math.floor(consistency);
   const characters = testWords.reduce((characters, word) => {
@@ -48,7 +49,7 @@ function TestResults() {
         />
         <StatGroup
           title={{ text: 'acc', size: 32 }}
-          values={[{ text: `${accuracy}%`, size: 64 }]}
+          values={[{ text: `${intAccuracy}%`, size: 64 }]}
         />
       </Styled.Stats>
       <Styled.Wrapper>
