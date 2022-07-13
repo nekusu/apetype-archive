@@ -24,6 +24,16 @@ function Chart() {
   if (stats.raw.length > elapsedTime) {
     labels[stats.raw.length - 1] = elapsedTime;
   }
+  const style = {
+    font: { family: theme.fontFamily },
+    color: theme.sub,
+  };
+  const ticks = {
+    precision: 0,
+    autoSkip: true,
+    autoSkipPadding: 20,
+    ...style,
+  };
   const options: ChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -31,59 +41,50 @@ function Chart() {
       intersect: false,
       mode: 'index',
     },
+    animations: {
+      color: { duration: 0.25 },
+    },
     scales: {
       x: {
         axis: 'x',
-        display: true,
-        ticks: {
-          autoSkip: true,
-          autoSkipPadding: 20,
-          color: theme.sub,
-        },
+        ticks,
+        grid: { color: theme.subAlt },
       },
       wpm: {
         axis: 'y',
-        display: true,
         title: {
           display: true,
           text: 'Words per Minute',
-          color: theme.sub,
+          ...style,
         },
         beginAtZero: true,
         min: 0,
-        ticks: {
-          autoSkip: true,
-          autoSkipPadding: 20,
-          color: theme.sub,
-        },
-        grid: {
-          display: true,
-        },
+        ticks,
+        grid: { color: theme.subAlt },
       },
       error: {
         axis: 'y',
-        display: true,
         position: 'right',
         title: {
           display: true,
           text: 'Errors',
-          color: theme.sub,
+          ...style,
         },
         beginAtZero: true,
         max: Math.max(...errorCount) + 1,
-        ticks: {
-          precision: 0,
-          autoSkip: true,
-          autoSkipPadding: 20,
-          color: theme.sub,
-        },
-        grid: {
-          display: false,
-        },
+        ticks,
+        grid: { display: false },
       },
     },
     plugins: {
       tooltip: {
+        padding: 10,
+        titleFont: { family: theme.fontFamily },
+        bodyFont: { family: theme.fontFamily },
+        backgroundColor: theme.sub,
+        titleColor: theme.text,
+        bodyColor: theme.text,
+        cornerRadius: 8,
         callbacks: {
           labelColor: (tooltipItem: TooltipItem<'line'>) => {
             const { borderColor } = tooltipItem.dataset;
