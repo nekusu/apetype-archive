@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const slice = createSlice({
-  name: 'config',
-  initialState: {
+const savedConfig = localStorage.getItem('config');
+const initialState: ApeTypes.Config = savedConfig
+  ? JSON.parse(savedConfig)
+  : {
     mode: 'time',
     time: 15,
     words: 10,
@@ -10,7 +11,11 @@ const slice = createSlice({
     fontFamily: 'Lexend Deca',
     themeName: 'aurora',
     randomTheme: 'dark',
-  } as ApeTypes.Config,
+  };
+
+const slice = createSlice({
+  name: 'config',
+  initialState,
   reducers: {
     setMode: (state, action: PayloadAction<ApeTypes.Config['mode']>) => {
       state.mode = action.payload;

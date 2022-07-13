@@ -10,10 +10,18 @@ import Styled, { GlobalStyle } from './App.styles';
 
 function App() {
   const dispatch = useAppDispatch();
-  const { theme, commandLine } = useAppSelector(({ app }) => app);
-  const { fontFamily, themeName } = useAppSelector(({ config }) => config);
+  const app = useAppSelector(({ app }) => app);
+  const config = useAppSelector(({ config }) => config);
+  const { theme, commandLine } = app;
+  const { fontFamily, themeName } = config;
   const location = useLocation();
 
+  useEffect(() => {
+    localStorage.setItem('app', JSON.stringify(app));
+  }, [app]);
+  useEffect(() => {
+    localStorage.setItem('config', JSON.stringify(config));
+  }, [config]);
   useEffect(() => {
     (async () => {
       dispatch(setTheme((await import(`../themes/${themeName}.ts`)).default));

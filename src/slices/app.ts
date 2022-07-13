@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { DefaultTheme } from 'styled-components';
-import defaultColors from '../themes/aurora';
+import defaultTheme from '../themes/dark';
 
 interface State {
   theme: Omit<DefaultTheme, 'fontFamily'>;
@@ -10,8 +10,13 @@ interface State {
   };
 }
 
+const savedTheme = localStorage.getItem('theme');
+const theme: DefaultTheme = savedTheme
+  ? JSON.parse(savedTheme)
+  : defaultTheme;
+
 const initialState: State = {
-  theme: defaultColors,
+  theme,
   commandLine: {
     isOpen: false,
     initial: '',
