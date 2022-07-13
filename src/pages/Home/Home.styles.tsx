@@ -1,5 +1,6 @@
 import { m } from 'framer-motion';
 import styled from 'styled-components';
+import { Button } from '../../components/ui';
 
 const Home = styled(m.div).attrs(() => ({
   initial: { opacity: 0 },
@@ -7,6 +8,8 @@ const Home = styled(m.div).attrs(() => ({
   exit: { opacity: 0 },
 }))`
   width: 100%;
+  padding-bottom: 70px;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -50,11 +53,43 @@ const Buttons = styled.div`
   }
 `;
 
+const Bottom = styled.div`
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+`;
+
+const Tips = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: ${p => p.theme.sub};
+  transition-property: color;
+`;
+
+const CommandLineButton = styled(Button)`
+  padding: 10px;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  font-size: 18px;
+  border-radius: 50%;
+`;
+
 const Styled = {
   Home,
   CustomConfig,
   Wrapper,
   Buttons,
+  Bottom,
+  Tips,
+  CommandLineButton,
 };
 
 export default Styled;

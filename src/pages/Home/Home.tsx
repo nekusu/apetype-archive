@@ -3,10 +3,10 @@ import { AnimatePresence } from 'framer-motion';
 import { formatDuration } from 'date-fns';
 import useEventListener from 'use-typed-event-listener';
 import uniqid from 'uniqid';
-import { RiArrowRightSLine } from 'react-icons/ri';
+import { RiArrowRightSLine, RiTerminalLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Keymap, TestResults, TestStats, TypingTest } from '../../components';
-import { Button, Input, Loading, Popup } from '../../components/ui';
+import { Button, Input, Key, Loading, Popup } from '../../components/ui';
 import { setCommandLine } from '../../slices/app';
 import { setThemeName, setTime, setWords } from '../../slices/config';
 import { setTestLanguage, setIsFinished, setIsTestPopupOpen } from '../../slices/typingTest';
@@ -25,7 +25,7 @@ function Home() {
     words,
     language,
   } = useAppSelector(({ config }) => config);
-  const { testLanguage, isFinished, isTestPopupOpen } = useAppSelector(({ typingTest }) => typingTest);
+  const { testLanguage, isTyping, isFinished, isTestPopupOpen } = useAppSelector(({ typingTest }) => typingTest);
   const [id, setId] = useState(uniqid());
   const [customAmount, setCustomAmount] = useState('0');
   const testId = `${mode}-${mode === 'time' ? time : mode === 'words' ? words : ''}-${language}-${id}`;
@@ -106,7 +106,7 @@ function Home() {
             </Styled.Wrapper>
         }
       </AnimatePresence>
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence>
         {isTestPopupOpen && (
           <Popup close={() => dispatch(setIsTestPopupOpen(false))}>
             <Styled.CustomConfig>
@@ -121,12 +121,32 @@ function Home() {
                   onChange={({ target: { value } }) => setCustomAmount(value)}
                   autoFocus
                 />
-                You can start an infinite test by inputting 0.
-                To stop the test, use shift + enter.
+                <div>
+                  You can start an infinite test by inputting 0.
+                  To stop the test, use <Key>shift</Key> + <Key>enter</Key>
+                </div>
                 <Button type="submit">ok</Button>
               </form>
             </Styled.CustomConfig>
           </Popup>
+        )}
+        {!isTyping && (
+          <Styled.Bottom key="bottom">
+            <Styled.Tips>
+              {(mode === 'zen' || mode === 'words' && !words || mode === 'time' && !time) && (
+                <div><Key>shift</Key> + <Key>enter</Key> - stop test</div>
+              )}
+              <div><Key>tab</Key> - restart test</div>
+              <div><Key>esc</Key> - command line</div>
+            </Styled.Tips>
+            <Styled.CommandLineButton
+              title="Command line"
+              active
+              onClick={() => dispatch(setCommandLine({ isOpen: true }))}
+            >
+              <RiTerminalLine />
+            </Styled.CommandLineButton>
+          </Styled.Bottom>
         )}
       </AnimatePresence>
     </Styled.Home>
