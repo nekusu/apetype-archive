@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkapetype=self.webpackChunkapetype||[]).push([[7873],{7873:function(r,e,c){c.r(e);e.default={bg:"#0b0e13",main:"#60759f",caret:"#60759f",sub:"#394760",subAlt:"#141a24",text:"#9fadc6",error:"#c27070",errorExtra:"#c28b70",colorfulError:"#c27070",colorfulErrorExtra:"#c28b70"}}}]);
+//# sourceMappingURL=7873.61fd2f17.chunk.js.map
