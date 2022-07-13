@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { formatDuration } from 'date-fns';
 import useEventListener from 'use-typed-event-listener';
+import { useThrottledCallback } from 'use-debounce';
 import uniqid from 'uniqid';
 import { RiArrowRightSLine, RiTerminalLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
@@ -29,6 +30,11 @@ function Home() {
   const [id, setId] = useState(uniqid());
   const [customAmount, setCustomAmount] = useState('0');
   const testId = `${mode}-${mode === 'time' ? time : mode === 'words' ? words : ''}-${language}-${id}`;
+  const restartTestDebounced = useThrottledCallback(() => {
+    setId(uniqid());
+    chooseRandomTheme();
+    dispatch(setIsFinished(false));
+  }, 400, { trailing: false });
   const chooseRandomTheme = async () => {
     if (randomTheme === 'off') return;
     let filteredThemes = themes;
@@ -37,11 +43,6 @@ function Home() {
     }
     const newTheme = filteredThemes[Math.floor(Math.random() * filteredThemes.length)];
     dispatch(setThemeName(newTheme.name));
-  };
-  const restartTest = () => {
-    setId(uniqid());
-    chooseRandomTheme();
-    dispatch(setIsFinished(false));
   };
   const toggleCommandLine = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -53,7 +54,7 @@ function Home() {
   const handleTab = (e: KeyboardEvent) => {
     if (e.key === 'Tab') {
       e.preventDefault();
-      restartTest();
+      restartTestDebounced();
     }
   };
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -94,7 +95,7 @@ function Home() {
             ? <Styled.Wrapper key="result">
               <TestResults />
               <Styled.Buttons>
-                <Button alt title="Next test" onClick={restartTest}>
+                <Button alt title="Next test" onClick={restartTestDebounced}>
                   <RiArrowRightSLine />
                 </Button>
               </Styled.Buttons>
