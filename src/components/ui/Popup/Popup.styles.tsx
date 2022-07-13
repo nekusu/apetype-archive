@@ -17,7 +17,7 @@ const Wrapper = styled(m.div).attrs(() => ({
   align-items: ${p => p.$top ? 'flex-start' : 'center'};
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(1.5px);
+  backdrop-filter: blur(2.5px);
   user-select: none;
 `;
 
@@ -32,7 +32,7 @@ const Popup = styled.div<{ $maxWidth?: number; }>`
   color: ${p => p.theme.sub};
   border-radius: 8px;
   overflow: hidden;
-  transition: background-color 0.25s, color 0.25s;
+  transition-property: background-color, color;
 `;
 
 const Styled = {

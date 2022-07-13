@@ -11,6 +11,7 @@ const SearchBar = styled.div`
     margin-left: 7px;
     font-size: 16px;
     color: ${p => p.theme.text};
+    transition-property: color;
   }
 `;
 
@@ -29,7 +30,7 @@ const Input = styled.input`
   background-color: transparent;
   color: inherit;
   flex: 1 1;
-  transition: color 0.25s;
+  transition-property: color;
 `;
 
 const List = styled.div`
@@ -48,7 +49,8 @@ const Item = styled.div<{ $active: boolean; $selected?: boolean; }>`
   background-color: ${p => p.$active && p.$selected ? p.theme.text : p.$active ? p.theme.main : 'transparent'};
   color: ${p => p.$active ? p.theme.bg : p.$selected ? p.theme.text : p.theme.sub};
   cursor: pointer;
-  transition: background-color ${p => p.$active ? 0 : 0.15}s, color ${p => p.$active ? 0 : 0.15}s;
+  transition-property: background-color, color;
+  transition-duration: 0.1s;
 
   >*:last-child {
     display: ${p => p.$selected ? 'block' : 'none'};

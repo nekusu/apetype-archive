@@ -25,10 +25,6 @@ const Loading = styled(CircularProgress).attrs((props) => ({
   max-height: 80px;
   width: 100%;
   max-width: 80px;
-
-  circle {
-    transition: stroke 0.25s;
-  }
 `;
 
 const Styled = {

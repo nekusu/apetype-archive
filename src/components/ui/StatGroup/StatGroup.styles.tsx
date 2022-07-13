@@ -10,12 +10,13 @@ const Title = styled.div <{ $size?: number; }> `
   font-size: ${p => p.$size || 16}px;
   line-height: ${p => p.$size || 16}px;
   color: ${p => p.theme.sub};
-  transition: color 0.25s;
+  transition-property: color;
 `;
 
 const Value = styled(Title)`
   margin: 0;
   color: ${p => p.theme.main};
+  transition-property: color;
 `;
 
 const Styled = {

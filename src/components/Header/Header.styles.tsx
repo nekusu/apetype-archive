@@ -23,7 +23,7 @@ const Icon = styled(IconSvg) <{ $typing: boolean; }>`
   height: 25px;
   width: 35px;
   stroke: ${p => p.$typing ? p.theme.sub : p.theme.main};
-  transition: stroke 0.25s;
+  transition-property: stroke;
 `;
 
 const Text = styled.div<{ $typing: boolean; }>`
@@ -31,7 +31,7 @@ const Text = styled.div<{ $typing: boolean; }>`
   position: relative;
   font-size: 32px;
   color: ${p => p.$typing ? p.theme.sub : p.theme.text};
-  transition: color 0.25s;
+  transition-property: color;
 `;
 
 const TopText = styled(m.div).attrs(() => ({
@@ -44,7 +44,7 @@ const TopText = styled(m.div).attrs(() => ({
   left: 12px;
   font-size: 10px;
   color: ${p => p.theme.sub};
-  transition: color 0.25s;
+  transition-property: color;
 `;
 
 const Menu = styled(m.div).attrs(() => ({

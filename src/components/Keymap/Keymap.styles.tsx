@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 const Keymap = styled.div`
-  margin-top: 26px;
+  margin-top: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,7 +20,8 @@ const Key = styled.div<{ $active: boolean; }>`
   background-color: ${p => p.$active ? p.theme.main : 'transparent'};
   border: 1px solid ${p => p.theme.sub};
   border-radius: 8px;
-  transition: background-color ${p => p.$active ? '0' : '0.25s'}, border-color 0.25s;
+  transition-property: background-color, border-color;
+  transition-duration: ${p => p.$active ? '0s' : 'inherit'};
 `;
 
 const Spacebar = styled(Key)`

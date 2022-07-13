@@ -8,6 +8,8 @@ const GlobalStyle = createGlobalStyle`
     outline: none;
     border: none;
     text-decoration: none;
+    transition-property: none;
+    transition-duration: 0.25s;
   }
 `;
 
@@ -16,7 +18,7 @@ const App = styled.div`
   flex-direction: column;
   align-items: center;
   background-color: ${p => p.theme.bg};
-  transition: background-color 0.25s;
+  transition-property: background-color;
 `;
 
 const Content = styled.div`
@@ -27,6 +29,8 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
+  gap: 20px;
 `;
 
 const Styled = {

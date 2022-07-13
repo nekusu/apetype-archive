@@ -17,7 +17,7 @@ const TestStats = styled(m.div).attrs(() => ({
   font-size: 24px;
   line-height: 24px;
   color: ${p => p.theme.main};
-  transition: color 0.25s;
+  transition-property: color;
 `;
 
 const Styled = {

@@ -6,7 +6,7 @@ const TypingTest = styled(m.div).attrs(() => ({
   animate: { opacity: 1 },
   exit: { opacity: 0 },
 }))`
-  min-height: 38px;
+  min-height: 122px;
   max-height: 122px;
   position: relative;
   display: flex;
@@ -36,14 +36,14 @@ const OutOfFocus = styled(m.div).attrs(() => ({
   gap: 6px;
   color: ${p => p.theme.text};
   pointer-events: none;
-  transition: color 0.25s;
+  transition-property: color;
 `;
 
 const Wrapper = styled.div<{ $blurred: boolean; }>`
   padding: 4px 2px;
   position: relative;
   flex: 1 1;
-  opacity: ${p => p.$blurred ? '0.4' : '1'} !important;
+  opacity: ${p => p.$blurred ? '0.4' : '1'};
   filter: ${p => p.$blurred ? 'blur(5px)' : 'none'};
   cursor: ${p => p.$blurred ? 'pointer' : 'auto'};
   overflow: hidden;
@@ -63,7 +63,6 @@ const Caret = styled(m.div).attrs(() => ({
   position: absolute;
   border-radius: 2px;
   background-color: ${p => p.theme.caret};
-  transition: background-color 0.25s;
 `;
 
 const Words = styled(m.div).attrs(() => ({
