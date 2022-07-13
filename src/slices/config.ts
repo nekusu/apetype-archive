@@ -7,6 +7,7 @@ const slice = createSlice({
     time: 15,
     words: 10,
     language: 'english',
+    fontFamily: 'Lexend Deca',
     themeName: 'aurora',
     randomTheme: 'dark',
   } as ApeTypes.Config,
@@ -29,6 +30,9 @@ const slice = createSlice({
     setLanguage: (state, action: PayloadAction<ApeTypes.Config['language']>) => {
       state.language = action.payload;
     },
+    setFontFamily: (state, action: PayloadAction<ApeTypes.Config['fontFamily']>) => {
+      state.fontFamily = action.payload;
+    },
     setThemeName: (state, action: PayloadAction<ApeTypes.Config['themeName']>) => {
       state.themeName = action.payload;
     },
@@ -43,6 +47,7 @@ export const {
   setTime,
   setWords,
   setLanguage,
+  setFontFamily,
   setThemeName,
   setRandomTheme,
 } = slice.actions;

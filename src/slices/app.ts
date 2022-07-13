@@ -3,7 +3,7 @@ import { DefaultTheme } from 'styled-components';
 import defaultColors from '../themes/aurora';
 
 interface State {
-  theme: DefaultTheme;
+  theme: Omit<DefaultTheme, 'fontFamily'>;
   commandLine: {
     isOpen: boolean;
     initial: string;

@@ -138,6 +138,7 @@ function CommandLine() {
                 ref={index === activeIndex ? listItem : null}
                 onMouseOver={() => hoverItem(index)}
                 onClick={() => changeConfig(option)}
+                style={{ fontFamily: selected === 'fontFamily' ? option.toString() : undefined }}
                 $active={index === activeIndex}
                 $selected={selectedValue === option}
               >

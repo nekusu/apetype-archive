@@ -11,7 +11,7 @@ import Styled, { GlobalStyle } from './App.styles';
 function App() {
   const dispatch = useAppDispatch();
   const { theme, commandLine } = useAppSelector(({ app }) => app);
-  const { themeName } = useAppSelector(({ config }) => config);
+  const { fontFamily, themeName } = useAppSelector(({ config }) => config);
   const location = useLocation();
 
   useEffect(() => {
@@ -21,7 +21,7 @@ function App() {
   }, [dispatch, themeName]);
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={{ ...theme, fontFamily }}>
       <LazyMotion features={domAnimation}>
         <MotionConfig transition={{ opacity: { duration: 0.25 } }}>
           <GlobalStyle />

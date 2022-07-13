@@ -4,6 +4,7 @@ declare namespace ApeTypes {
     time: number;
     words: number;
     language: string;
+    fontFamily: string;
     themeName: string;
     randomTheme: 'off' | 'on' | 'light' | 'dark';
   }

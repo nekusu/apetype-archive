@@ -17,6 +17,7 @@ const App = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-family: ${p => p.theme.fontFamily || 'sans-serif'};
   background-color: ${p => p.theme.bg};
   transition-property: background-color;
 `;
