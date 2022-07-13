@@ -1,17 +1,18 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useIsPresent } from 'framer-motion';
+import { useDebouncedCallback } from 'use-debounce';
 import { RiTerminalLine, RiCheckLine, RiSettingsLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { setTheme, setCommandLine } from '../../slices/app';
 import { Button, Popup } from '../ui';
 import configList from '../../config/_list';
-import themes from '../../themes/_list';
 import Styled from './CommandLine.styles';
 
 function CommandLine() {
   const dispatch = useAppDispatch();
   const { commandLine } = useAppSelector(({ app }) => app);
   const config = useAppSelector(({ config }) => config);
+  const [isUsingKeyboard, setIsUsingKeyboard] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const [selected, setSelected] = useState(commandLine.initial);
@@ -20,12 +21,20 @@ function CommandLine() {
   const isPresent = useIsPresent();
   const input = useRef<HTMLInputElement>(null);
   const listItem = useRef<HTMLDivElement>(null);
-  const selectedConfig = config[selected as keyof typeof config];
+  const selectedValue = config[selected as keyof typeof config];
+  const setThemeDebounced = useDebouncedCallback(async (themeName) => {
+    if (!isPresent) return;
+    dispatch(setTheme((await import(`../../themes/${themeName}.ts`)).default));
+  }, 250);
+  const hoverItem = (index: number) => {
+    if (isUsingKeyboard) return;
+    setActiveIndex(index);
+  };
   const deleteCommand = async () => {
-    if (selected === 'themeName') {
-      dispatch(setTheme((await import(`../../themes/${config.themeName}.ts`)).default));
-    }
     setSelected('');
+    if (selected !== 'themeName') return;
+    setThemeDebounced.cancel();
+    dispatch(setTheme((await import(`../../themes/${config.themeName}.ts`)).default));
   };
   const changeConfig = (option: string | number) => {
     input.current?.focus();
@@ -48,8 +57,50 @@ function CommandLine() {
     } else if (e.key === 'Enter') {
       listItem.current?.click();
     }
+    setIsUsingKeyboard(true);
   };
 
+  useLayoutEffect(() => {
+    const value = inputValue.replace(/[^a-zA-Z0-9\s_-]+/gi, '');
+    const trimmedValue = value.trim();
+    const regex = new RegExp(trimmedValue, 'gi');
+    if (selected) {
+      const selectedOptions = configList[selected].options
+        .filter((option) => option.toString().match(regex))
+        .sort((a, b) => a.toString().search(regex) - b.toString().search(regex));
+      const selectedindex = selectedOptions
+        .reduce((index: number, option, currentIndex) => {
+          return selectedValue === option ? currentIndex : index;
+        }, 0);
+      setSelectedOptions(selectedOptions);
+      setActiveIndex(trimmedValue ? 0 : selectedindex);
+    } else {
+      const configItems = Object.entries(configList)
+        .filter(([, { command }]) => command.match(regex))
+        .sort(([, a], [, b]) => a.command.search(regex) - b.command.search(regex));
+      if (value.endsWith(' ')) {
+        const item = configItems.find(([, { command }]) => command === trimmedValue);
+        if (configItems.length === 1 || item) {
+          listItem.current?.click();
+        }
+      }
+      setConfigItems(configItems);
+      setActiveIndex(0);
+    }
+  }, [inputValue, selected, selectedValue]);
+  useLayoutEffect(() => {
+    input.current?.focus();
+    setInputValue('');
+  }, [selected]);
+  useEffect(() => {
+    if (selected === 'themeName' && listItem.current) {
+      const themeName = listItem.current.innerText;
+      setThemeDebounced(themeName);
+    }
+  }, [activeIndex, selected, selectedOptions, setThemeDebounced]);
+  useEffect(() => {
+    listItem.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [activeIndex]);
   useEffect(() => {
     if (selected === 'themeName' && !isPresent) {
       (async () => {
@@ -57,40 +108,6 @@ function CommandLine() {
       })();
     }
   }, [dispatch, config.themeName, selected, isPresent]);
-  useLayoutEffect(() => {
-    const value = inputValue.replace(/[^a-zA-Z0-9\s_]+/gi, '');
-    const regex = new RegExp(value.trim(), 'gi');
-    if (selected) {
-      const selectedOptions = configList[selected].options
-        .filter((option) => option.toString().match(regex))
-        .sort((a, b) => a.toString().search(regex) - b.toString().search(regex));
-      setSelectedOptions(selectedOptions);
-    } else {
-      const configItems = Object.entries(configList)
-        .filter(([, { command }]) => command.match(regex))
-        .sort(([, a], [, b]) => a.command.search(regex) - b.command.search(regex));
-      setConfigItems(configItems);
-      if (value.endsWith(' ')) {
-        const item = configItems.find(([, { command }]) => command === value.trim());
-        if (configItems.length === 1 || item) {
-          listItem.current?.click();
-        }
-      }
-    }
-    setActiveIndex(0);
-  }, [inputValue, selected]);
-  useLayoutEffect(() => {
-    input.current?.focus();
-    setInputValue('');
-  }, [selected]);
-  useLayoutEffect(() => {
-    if (selected === 'themeName') {
-      const themeName = themes[activeIndex].name;
-      (async () => {
-        dispatch(setTheme((await import(`../../themes/${themeName}.ts`)).default));
-      })();
-    }
-  }, [dispatch, activeIndex, selected]);
 
   return (
     <Popup top maxWidth={700} close={() => dispatch(setCommandLine({ isOpen: false }))}>
@@ -112,17 +129,17 @@ function CommandLine() {
           <RiSettingsLine />
         </Button>
       </Styled.SearchBar>
-      <Styled.List>
+      <Styled.List onMouseMove={() => setIsUsingKeyboard(false)}>
         {selected
           ? <>
             {selectedOptions.map((option, index) => (
               <Styled.Item
                 key={option}
                 ref={index === activeIndex ? listItem : null}
-                onMouseOver={() => setActiveIndex(index)}
+                onMouseOver={() => hoverItem(index)}
                 onClick={() => changeConfig(option)}
                 $active={index === activeIndex}
-                $selected={selectedConfig === option}
+                $selected={selectedValue === option}
               >
                 {option}
                 <RiCheckLine />
@@ -132,13 +149,13 @@ function CommandLine() {
               <Styled.Item
                 key="custom"
                 ref={selectedOptions.length === activeIndex ? listItem : null}
-                onMouseOver={() => setActiveIndex(selectedOptions.length)}
+                onMouseOver={() => hoverItem(selectedOptions.length)}
                 onClick={() => changeConfig(inputValue)}
                 $active={selectedOptions.length === activeIndex}
-                $selected={!configList[selected].options?.includes(selectedConfig)}
+                $selected={!configList[selected].options?.includes(selectedValue)}
               >
                 custom
-                <span>{selectedConfig}</span>
+                <span>{selectedValue}</span>
               </Styled.Item>
             )}
           </>
@@ -146,7 +163,7 @@ function CommandLine() {
             <Styled.Item
               key={key}
               ref={index === activeIndex ? listItem : null}
-              onMouseOver={() => setActiveIndex(index)}
+              onMouseOver={() => hoverItem(index)}
               onClick={() => setSelected(key)}
               $active={index === activeIndex}
             >
