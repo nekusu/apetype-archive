@@ -53,7 +53,11 @@ const Buttons = styled.div`
   }
 `;
 
-const Bottom = styled.div`
+const Bottom = styled(m.div).attrs(() => ({
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+}))`
   width: 100%;
   position: absolute;
   bottom: 0;

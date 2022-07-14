@@ -1,6 +1,5 @@
 import { m } from 'framer-motion';
 import styled from 'styled-components';
-import { ReactComponent as IconSvg } from '../../images/icon.svg';
 
 const Header = styled.header`
   width: 100%;
@@ -19,14 +18,10 @@ const Logo = styled.div`
   cursor: pointer;
 `;
 
-const Icon = styled(IconSvg) <{ $typing: boolean; }>`
-  height: 25px;
-  width: 35px;
-  stroke: ${p => p.$typing ? p.theme.sub : p.theme.main};
-  transition-property: stroke;
-`;
-
-const Text = styled.div<{ $typing: boolean; }>`
+const Text = styled(m.div).attrs(() => ({
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.75 } },
+})) <{ $typing: boolean; }>`
   margin-bottom: 7px;
   position: relative;
   font-size: 32px;
@@ -35,8 +30,18 @@ const Text = styled.div<{ $typing: boolean; }>`
 `;
 
 const TopText = styled(m.div).attrs(() => ({
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
+  initial: { opacity: 0, x: -30 },
+  animate: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      delay: 0.75,
+      duration: 0.75,
+      type: 'spring',
+      stiffness: 30,
+      damping: 10,
+    },
+  },
   exit: { opacity: 0 },
 }))`
   position: absolute;
@@ -49,7 +54,7 @@ const TopText = styled(m.div).attrs(() => ({
 
 const Menu = styled(m.div).attrs(() => ({
   initial: { opacity: 0 },
-  animate: { opacity: 1 },
+  animate: { opacity: 1, transition: { delay: 0.25, duration: 0.5 } },
   exit: { opacity: 0 },
 }))`
   display: flex;
@@ -86,7 +91,6 @@ const ConfigGroup = styled.div`
 const Styled = {
   Header,
   Logo,
-  Icon,
   Text,
   TopText,
   Menu,

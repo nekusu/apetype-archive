@@ -10,7 +10,12 @@ import { Keymap, TestResults, TestStats, TypingTest } from '../../components';
 import { Button, Input, Key, Loading, Popup } from '../../components/ui';
 import { setCommandLine } from '../../slices/app';
 import { setThemeName, setTime, setWords } from '../../slices/config';
-import { setTestLanguage, setIsFinished, setIsTestPopupOpen } from '../../slices/typingTest';
+import {
+  setTestLanguage,
+  setIsTyping,
+  setIsFinished,
+  setIsTestPopupOpen,
+} from '../../slices/typingTest';
 import languages from '../../languages/_list';
 import Styled from './Home.styles';
 
@@ -41,6 +46,7 @@ function Home({ setRandomTheme }: Props) {
     setId(uniqid());
     setRandomTheme();
     dispatch(setIsFinished(false));
+    dispatch(setIsTyping(false));
   }, 400, { trailing: false });
   const toggleCommandLine = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
