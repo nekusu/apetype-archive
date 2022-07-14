@@ -11,39 +11,37 @@ import { Button, Input, Key, Loading, Popup } from '../../components/ui';
 import { setCommandLine } from '../../slices/app';
 import { setThemeName, setTime, setWords } from '../../slices/config';
 import { setTestLanguage, setIsFinished, setIsTestPopupOpen } from '../../slices/typingTest';
-import themes from '../../themes/_list';
 import languages from '../../languages/_list';
 import Styled from './Home.styles';
 
-function Home() {
+interface Props {
+  setRandomTheme: () => void;
+}
+
+function Home({ setRandomTheme }: Props) {
   const dispatch = useAppDispatch();
   const { commandLine } = useAppSelector(({ app }) => app);
   const {
     themeName,
-    randomTheme,
     mode,
     time,
     words,
     language,
   } = useAppSelector(({ config }) => config);
-  const { testLanguage, isTyping, isFinished, isTestPopupOpen } = useAppSelector(({ typingTest }) => typingTest);
+  const {
+    testLanguage,
+    isTyping,
+    isFinished,
+    isTestPopupOpen,
+  } = useAppSelector(({ typingTest }) => typingTest);
   const [id, setId] = useState(uniqid());
   const [customAmount, setCustomAmount] = useState('0');
   const testId = `${mode}-${mode === 'time' ? time : mode === 'words' ? words : ''}-${language}-${id}`;
   const restartTestDebounced = useThrottledCallback(() => {
     setId(uniqid());
-    chooseRandomTheme();
+    setRandomTheme();
     dispatch(setIsFinished(false));
   }, 400, { trailing: false });
-  const chooseRandomTheme = async () => {
-    if (randomTheme === 'off') return;
-    let filteredThemes = themes;
-    if (randomTheme === 'light' || randomTheme === 'dark') {
-      filteredThemes = themes.filter((t) => t.mode === randomTheme && t.name !== themeName);
-    }
-    const newTheme = filteredThemes[Math.floor(Math.random() * filteredThemes.length)];
-    dispatch(setThemeName(newTheme.name));
-  };
   const toggleCommandLine = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       e.preventDefault();

@@ -9,8 +9,8 @@ const initialState: ApeTypes.Config = savedConfig
     words: 10,
     language: 'english',
     fontFamily: 'Lexend Deca',
-    themeName: 'aurora',
-    randomTheme: 'dark',
+    themeName: '',
+    randomTheme: 'on',
   };
 
 const slice = createSlice({

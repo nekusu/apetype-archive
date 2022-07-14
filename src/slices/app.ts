@@ -10,13 +10,8 @@ interface State {
   };
 }
 
-const savedTheme = localStorage.getItem('theme');
-const theme: DefaultTheme = savedTheme
-  ? JSON.parse(savedTheme)
-  : defaultTheme;
-
 const initialState: State = {
-  theme,
+  theme: defaultTheme,
   commandLine: {
     isOpen: false,
     initial: '',
