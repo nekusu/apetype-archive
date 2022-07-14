@@ -1,10 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useIsPresent } from 'framer-motion';
 import { useDebouncedCallback } from 'use-debounce';
 import { RiTerminalLine, RiCheckLine, RiSettingsLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { setTheme, setCommandLine } from '../../slices/app';
-import { Button, Popup } from '../ui';
+import { Button, Key, Popup } from '../ui';
 import configList from '../../config/_list';
 import Styled from './CommandLine.styles';
 
@@ -20,7 +20,7 @@ function CommandLine() {
   const [selectedOptions, setSelectedOptions] = useState(configList[selected]?.options || []);
   const isPresent = useIsPresent();
   const input = useRef<HTMLInputElement>(null);
-  const listItem = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLDivElement>(null);
   const selectedValue = config[selected as keyof typeof config];
   const setThemeDebounced = useDebouncedCallback(async (themeName) => {
     if (!isPresent) return;
@@ -54,14 +54,16 @@ function CommandLine() {
       setActiveIndex((index) => (index - 1) < 0 ? maxIndex - 1 : index - 1);
     } else if (e.key === 'Backspace' && !inputValue) {
       deleteCommand();
-    } else if (e.key === 'Enter') {
-      listItem.current?.click();
     }
     setIsUsingKeyboard(true);
   };
+  const selectCommand = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    (list.current?.children[activeIndex] as HTMLDivElement)?.click();
+  };
 
   useLayoutEffect(() => {
-    const value = inputValue.replace(/[^a-zA-Z0-9\s_-]+/gi, '');
+    const value = filterValue(inputValue);
     const trimmedValue = value.trim();
     const regex = new RegExp(trimmedValue, 'gi');
     if (selected) {
@@ -81,7 +83,7 @@ function CommandLine() {
       if (value.endsWith(' ')) {
         const item = configItems.find(([, { command }]) => command === trimmedValue);
         if (configItems.length === 1 || item) {
-          listItem.current?.click();
+          (list.current?.children[0] as HTMLDivElement)?.click();
         }
       }
       setConfigItems(configItems);
@@ -93,13 +95,14 @@ function CommandLine() {
     setInputValue('');
   }, [selected]);
   useEffect(() => {
-    if (selected === 'themeName' && listItem.current) {
-      const themeName = listItem.current.innerText;
+    if (selected === 'themeName' && selectedOptions.length) {
+      const themeName = selectedOptions[activeIndex];
       setThemeDebounced(themeName);
     }
   }, [activeIndex, selected, selectedOptions, setThemeDebounced]);
   useEffect(() => {
-    listItem.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    (list.current?.children[activeIndex] as HTMLDivElement)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [activeIndex]);
   useEffect(() => {
     if (selected === 'themeName' && !isPresent) {
@@ -118,24 +121,25 @@ function CommandLine() {
             {configList[selected].command}
           </Styled.Command>
         )}
-        <Styled.Input
-          ref={input}
-          placeholder={selected ? 'type value' : 'type command'}
-          value={inputValue}
-          onChange={({ target: { value } }) => setInputValue(value)}
-          autoFocus
-        />
+        <form onSubmit={selectCommand}>
+          <Styled.Input
+            ref={input}
+            placeholder={selected ? 'type value' : 'type command'}
+            value={inputValue}
+            onChange={({ target: { value } }) => setInputValue(value)}
+            autoFocus
+          />
+        </form>
         <Button text title="Settings" navigate="/settings">
           <RiSettingsLine />
         </Button>
       </Styled.SearchBar>
-      <Styled.List onMouseMove={() => setIsUsingKeyboard(false)}>
+      <Styled.List ref={list} onMouseMove={() => setIsUsingKeyboard(false)}>
         {selected
           ? <>
             {selectedOptions.map((option, index) => (
               <Styled.Item
                 key={option}
-                ref={index === activeIndex ? listItem : null}
                 onMouseOver={() => hoverItem(index)}
                 onClick={() => changeConfig(option)}
                 style={{ fontFamily: selected === 'fontFamily' ? option.toString() : undefined }}
@@ -149,7 +153,6 @@ function CommandLine() {
             {configList[selected].custom && (
               <Styled.Item
                 key="custom"
-                ref={selectedOptions.length === activeIndex ? listItem : null}
                 onMouseOver={() => hoverItem(selectedOptions.length)}
                 onClick={() => changeConfig(inputValue)}
                 $active={selectedOptions.length === activeIndex}
@@ -160,15 +163,17 @@ function CommandLine() {
               </Styled.Item>
             )}
           </>
-          : configItems.map(([key, value], index) => (
+          : configItems.map(([key, { command }], index) => (
             <Styled.Item
               key={key}
-              ref={index === activeIndex ? listItem : null}
               onMouseOver={() => hoverItem(index)}
               onClick={() => setSelected(key)}
               $active={index === activeIndex}
             >
-              {value.command}
+              {command}
+              {(configItems.length === 1 || filterValue(inputValue) === command) && (
+                <Key id="key">space</Key>
+              )}
             </Styled.Item>
           ))
         }
@@ -176,5 +181,9 @@ function CommandLine() {
     </Popup>
   );
 }
+
+const filterValue = (value: string) => {
+  return value.replace(/[^a-zA-Z0-9\s_-]+/gi, '');
+};
 
 export default CommandLine;

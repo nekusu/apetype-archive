@@ -13,6 +13,10 @@ const SearchBar = styled.div`
     color: ${p => p.theme.text};
     transition-property: color;
   }
+
+  form {
+    flex: 1 1;
+  }
 `;
 
 const Command = styled(Button)`
@@ -23,13 +27,13 @@ const Command = styled(Button)`
 
 const Input = styled.input`
   min-width: 0;
+  width: 100%;
   padding-block: 14px;
   font-family: inherit;
   font-size: 16px;
   caret-color: ${p => p.theme.caret};
   background-color: transparent;
   color: inherit;
-  flex: 1 1;
   transition-property: color;
 `;
 
@@ -52,8 +56,13 @@ const Item = styled.div<{ $active: boolean; $selected?: boolean; }>`
   transition-property: background-color, color;
   transition-duration: 0.1s;
 
-  >*:last-child {
+  >*:last-child:not(#key) {
     display: ${p => p.$selected ? 'block' : 'none'};
+  }
+
+  #key {
+    background-color: ${p => p.theme.subAlt};
+    color: ${p => p.theme.text};
   }
 
   svg {
