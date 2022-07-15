@@ -7,7 +7,7 @@ import { setTheme } from '../slices/app';
 import { setThemeName } from '../slices/config';
 import { setTestLanguage } from '../slices/typingTest';
 import { CommandLine, Header, Footer } from '../components';
-import { Home } from '../pages';
+import { Home, Settings } from '../pages';
 import themes from '../themes/_list';
 import languages from '../languages/_list';
 import Styled, { GlobalStyle } from './App.styles';
@@ -60,6 +60,7 @@ function App() {
               <AnimatePresence exitBeforeEnter>
                 <Routes location={location} key={location.pathname}>
                   <Route path="/" element={<Home setRandomTheme={setRandomTheme} />} />
+                  <Route path="/settings" element={<Settings />} />
                 </Routes>
               </AnimatePresence>
               <Footer />

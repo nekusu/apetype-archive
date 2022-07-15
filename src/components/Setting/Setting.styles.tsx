@@ -25,7 +25,7 @@ const Buttons = styled.div`
   grid-auto-columns: 1fr;
   grid-auto-flow: column;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 `;
 
 const Styled = {

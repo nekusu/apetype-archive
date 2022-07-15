@@ -6,6 +6,7 @@ import themes from '../themes/_list';
 interface ConfigItem {
   command: string;
   description?: string;
+  category?: string;
   options: (string | number)[];
   custom?: boolean;
   action: (arg: any) => any;
@@ -32,11 +33,15 @@ const config: { [index: string]: ConfigItem; } = {
   language: {
     command: 'language',
     description: 'Change in which language you want to type.',
+    category: 'behavior',
     options: languages,
     action: actions.setLanguage,
   },
   fontFamily: {
     command: 'font family',
+    description: 'Change the font family used troughout the website. If set to custom,\
+      make sure you have the font installed on your device before applying.',
+    category: 'appearance',
     options: [
       'Fira Code',
       'Inconsolata',
@@ -57,14 +62,17 @@ const config: { [index: string]: ConfigItem; } = {
   },
   themeName: {
     command: 'theme',
+    description: 'Change the color palette.',
+    category: 'theme',
     options: themes.map((t) => t.name),
     action: actions.setThemeName,
   },
   randomTheme: {
     command: 'randomize theme',
-    description: 'After completing a test, the theme will be set to a random one.\
-      The random themes are not saved to your config. If set to "light" or "dark",\
-      only presets with light or dark background colors will be randomized, respectively.',
+    description: 'After loading a new test, the theme will be set to a random one.\
+      If set to "light" or "dark", only presets with light or dark background colors\
+      will be randomized, respectively.',
+    category: 'theme',
     options: ['off', 'on', 'light', 'dark'],
     action: actions.setRandomTheme,
   },

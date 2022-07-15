@@ -29,7 +29,7 @@ function Setting({ name, commandLine }: Props) {
             isOpen: true,
             initial: name,
           }))}>
-            select
+            {configValue}
           </Button>
           : setting.options.map((option) => (
             <Button
