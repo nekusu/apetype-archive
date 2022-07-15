@@ -31,13 +31,13 @@ function Setting({ name, commandLine }: Props) {
           }))}>
             {configValue}
           </Button>
-          : setting.options.map((option) => (
+          : setting.options.map((option, index) => (
             <Button
               key={option}
               active={configValue === option}
               onClick={() => dispatch(setting.action(option))}
             >
-              {option}
+              {setting.altOptions?.[index] || option}
             </Button>
           ))
         }

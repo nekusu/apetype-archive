@@ -50,19 +50,15 @@ const Wrapper = styled.div<{ $blurred: boolean; }>`
   transition: opacity 0.4s, filter 0.4s;
 `;
 
-const Caret = styled(m.div).attrs(() => ({
-  transition: {
-    opacity: { repeat: Infinity, duration: 1 },
-    top: { ease: 'easeOut', duration: 0.1 },
-    left: { ease: 'easeOut', duration: 0.1 },
-  },
-}))`
-  height: 35px;
-  width: 3px;
-  margin-top: -2px;
+const Caret = styled(m.div) <{ $style: string; }>`
+  height: ${p => p.$style === 'underline' ? 3 : 35}px;
+  width: ${p => p.$style === 'default' ? 3 : 17}px;
+  margin-top: ${p => p.$style === 'underline' ? 30 : 0}px;
   position: absolute;
   border-radius: 2px;
-  background-color: ${p => p.theme.caret};
+  background-color: ${p => p.$style !== 'outline' ? p.theme.caret : 'transparent'};
+  border: ${p => p.$style === 'outline' ? '2px solid ' + p.theme.caret : 'none'};
+  transition-property: background-color, border-color;
 `;
 
 const Words = styled(m.div).attrs(() => ({

@@ -8,6 +8,7 @@ interface ConfigItem {
   description?: string;
   category?: string;
   options: (string | number)[];
+  altOptions?: (string | number)[];
   custom?: boolean;
   action: (arg: any) => any;
 }
@@ -36,6 +37,21 @@ const config: { [index: string]: ConfigItem; } = {
     category: 'behavior',
     options: languages,
     action: actions.setLanguage,
+  },
+  smoothCaret: {
+    command: 'smooth caret',
+    description: 'When enabled, the caret will move smoothly between letters and words.',
+    category: 'caret',
+    options: ['off', 'on'],
+    action: actions.setSmoothCaret,
+  },
+  caretStyle: {
+    command: 'caret style',
+    description: 'Change the style of the caret during the test.',
+    category: 'caret',
+    options: ['off', 'default', 'block', 'outline', 'underline'],
+    altOptions: ['off', '|', '▮', '▯', '_'],
+    action: actions.setCaretStyle,
   },
   fontFamily: {
     command: 'font family',

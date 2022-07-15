@@ -4,6 +4,8 @@ declare namespace ApeTypes {
     time: number;
     words: number;
     language: string;
+    smoothCaret: 'off' | 'on';
+    caretStyle: 'off' | 'default' | 'block' | 'outline' | 'underline';
     fontFamily: string;
     themeName: string;
     randomTheme: 'off' | 'on' | 'light' | 'dark';

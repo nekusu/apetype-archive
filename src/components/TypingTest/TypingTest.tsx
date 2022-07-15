@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, useIsPresent } from 'framer-motion';
 import useEventListener from 'use-typed-event-listener';
@@ -18,7 +17,7 @@ function TypingTest() {
   const dispatch = useAppDispatch();
   const { commandLine } = useAppSelector(({ app }) => app);
   const config = useAppSelector(({ config }) => config);
-  const { mode, words } = config;
+  const { mode, words, smoothCaret, caretStyle } = config;
   const {
     testLanguage,
     testWords,
@@ -31,15 +30,14 @@ function TypingTest() {
   } = useAppSelector(({ typingTest }) => typingTest);
   const [isFocused, setIsFocused] = useState(false);
   const [isBlurred, setIsBlurred] = useState(true);
-  const [caretPosition, setCaretPosition] = useState({ top: 2, left: 0 });
+  const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
   const isPresent = useIsPresent();
   const input = useRef<HTMLInputElement>(null);
-  const wordsWrapper = useRef<HTMLDivElement>(null);
   const currentWord = useRef<HTMLDivElement>(null);
   const currentLetter = useRef<HTMLSpanElement>(null);
   const blurTimeout = useRef<NodeJS.Timer>();
   const typingTimeout = useRef<NodeJS.Timer>();
-  const lastCaretTopPosition = useRef(2);
+  const lastCaretTopPosition = useRef(0);
   const generateTestWords = ({ words, characters }: { words?: number, characters: number; }) => {
     const newTestWords = [];
     let totalCharacters = 0;
@@ -95,6 +93,7 @@ function TypingTest() {
     } else if (mode === 'zen') {
       dispatch(setIsReady(true));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
   useEffect(() => {
     if (!isPresent) {
@@ -107,23 +106,24 @@ function TypingTest() {
     }
   }, [commandLine.isOpen, isTestPopupOpen]);
   useEffect(() => {
-    const top = currentWord.current?.offsetTop || 2;
+    const top = currentWord.current?.offsetTop || 0;
     const left = currentLetter.current
       ? currentLetter.current.offsetLeft + currentLetter.current.offsetWidth + 1
       : currentWord.current?.offsetLeft || 0;
-    wordsWrapper.current?.scrollTo({ top: top - 44, behavior: 'smooth' });
-    setCaretPosition({ top, left });
+    currentWord.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setCaretPosition({ x: left, y: top });
   }, [inputValue, wordIndex]);
   useEffect(() => {
-    if (caretPosition.top > lastCaretTopPosition.current) {
-      lastCaretTopPosition.current = caretPosition.top;
+    if (caretPosition.y > lastCaretTopPosition.current) {
+      lastCaretTopPosition.current = caretPosition.y;
       if (mode === 'words' && words > 0) {
         generateTestWords({ words: words - testWords.length, characters: 80 });
       } else if (mode === 'time' || mode === 'words' && !words) {
         generateTestWords({ characters: 80 });
       }
     }
-  }, [testWords, caretPosition.top]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [testWords, caretPosition.y]);
 
   return (
     <Styled.TypingTest>
@@ -136,24 +136,34 @@ function TypingTest() {
       <AnimatePresence>
         {isReady && (
           <Styled.Wrapper
-            ref={wordsWrapper}
             onClick={focusWords}
             $blurred={isBlurred}
           >
-            {isFocused && (
+            {isFocused && caretStyle !== 'off' && (
               <Styled.Caret
                 animate={{
                   opacity: [1, isTyping ? 1 : 0, 1],
-                  top: caretPosition.top,
-                  left: caretPosition.left,
+                  top: caretPosition.y,
+                  left: caretPosition.x,
+                  transition: {
+                    opacity: {
+                      repeat: Infinity,
+                      ease: smoothCaret === 'on' ? 'easeInOut' : [1, -10, 0, 10],
+                      duration: 1,
+                    },
+                    default: {
+                      ease: 'easeOut',
+                      duration: smoothCaret === 'on' ? 0.1 : 0,
+                    },
+                  },
                 }}
+                $style={caretStyle}
               />
             )}
             <Styled.Words>
               {testWords.map(({ original, typed, isCorrect, letters }, index) => (
                 <Styled.Word
-                  ref={wordIndex === index
-                    ? currentWord : null}
+                  ref={wordIndex === index ? currentWord : null}
                   key={`${original}-${index}`}
                   $error={wordIndex > index && !isCorrect}
                 >
