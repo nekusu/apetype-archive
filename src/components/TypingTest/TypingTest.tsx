@@ -40,13 +40,17 @@ function TypingTest() {
   const blurTimeout = useRef<NodeJS.Timer>();
   const typingTimeout = useRef<NodeJS.Timer>();
   const lastCaretTopPosition = useRef(2);
-  const generateTestWords = (amount: number) => {
-    if (!testLanguage.words.length) return;
-    const newTestWords: Set<string> = new Set();
-    while (newTestWords.size < amount) {
-      newTestWords.add(testLanguage.words[Math.floor(Math.random() * testLanguage.words.length)]);
+  const generateTestWords = ({ words, characters }: { words?: number, characters: number; }) => {
+    const newTestWords = [];
+    let totalCharacters = 0;
+    while (totalCharacters < characters) {
+      if (newTestWords.length === words) break;
+      const randomIndex = Math.floor(Math.random() * testLanguage.words.length);
+      const word = testLanguage.words[randomIndex];
+      newTestWords.push(testLanguage.words[randomIndex]);
+      totalCharacters += word.length;
     }
-    dispatch(addTestWords([...newTestWords]));
+    dispatch(addTestWords(newTestWords));
   };
   const focusWords = () => {
     clearTimeout(blurTimeout.current);
@@ -85,9 +89,9 @@ function TypingTest() {
   useEffect(() => {
     dispatch(resetTest());
     if (mode === 'words' && words > 0) {
-      generateTestWords(Math.min(words, 50));
-    } else if (mode === 'time' || !words) {
-      generateTestWords(50);
+      generateTestWords({ words, characters: 200 });
+    } else if (mode === 'time' || mode === 'words' && !words) {
+      generateTestWords({ characters: 200 });
     } else if (mode === 'zen') {
       dispatch(setIsReady(true));
     }
@@ -114,9 +118,9 @@ function TypingTest() {
     if (caretPosition.top > lastCaretTopPosition.current) {
       lastCaretTopPosition.current = caretPosition.top;
       if (mode === 'words' && words > 0) {
-        generateTestWords(Math.min(words - testWords.length, 12));
-      } else if (mode === 'time' || !words) {
-        generateTestWords(12);
+        generateTestWords({ words: words - testWords.length, characters: 80 });
+      } else if (mode === 'time' || mode === 'words' && !words) {
+        generateTestWords({ characters: 80 });
       }
     }
   }, [testWords, caretPosition.top]);
