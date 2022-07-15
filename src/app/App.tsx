@@ -5,16 +5,18 @@ import { ThemeProvider } from 'styled-components';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { setTheme } from '../slices/app';
 import { setThemeName } from '../slices/config';
+import { setTestLanguage } from '../slices/typingTest';
 import { CommandLine, Header, Footer } from '../components';
 import { Home } from '../pages';
 import themes from '../themes/_list';
+import languages from '../languages/_list';
 import Styled, { GlobalStyle } from './App.styles';
 
 function App() {
   const dispatch = useAppDispatch();
   const { theme, commandLine } = useAppSelector(({ app }) => app);
   const config = useAppSelector(({ config }) => config);
-  const { fontFamily, themeName, randomTheme } = config;
+  const { language, fontFamily, themeName, randomTheme } = config;
   const location = useLocation();
   const setRandomTheme = useCallback(async () => {
     if (randomTheme === 'off') return;
@@ -29,6 +31,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem('config', JSON.stringify(config));
   }, [config]);
+  useEffect(() => {
+    (async () => {
+      dispatch(setTestLanguage(await getLanguage(language)));
+    })();
+  }, [dispatch, language]);
   useEffect(() => {
     if (!themeName) {
       setRandomTheme();
@@ -64,4 +71,11 @@ function App() {
   );
 }
 
+const languageURL = (lang: string) => `https://raw.githubusercontent.com/monkeytypegame/
+monkeytype/master/frontend/static/languages/${lang.replace(/\s/g, '_')}.json`;
+const getLanguage = async (language: string = languages[0]) => {
+  const reponse = await fetch(languageURL(language));
+  const { words } = await reponse.json();
+  return { name: language, words };
+};
 export default App;

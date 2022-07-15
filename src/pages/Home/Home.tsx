@@ -4,19 +4,13 @@ import { formatDuration } from 'date-fns';
 import useEventListener from 'use-typed-event-listener';
 import { useThrottledCallback } from 'use-debounce';
 import uniqid from 'uniqid';
-import { RiArrowRightSLine, RiTerminalLine } from 'react-icons/ri';
+import { RiArrowRightSLine, RiTerminalLine, RiGlobeFill } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Keymap, TestResults, TestStats, TypingTest } from '../../components';
 import { Button, Input, Key, Loading, Popup } from '../../components/ui';
 import { setCommandLine } from '../../slices/app';
-import { setThemeName, setTime, setWords } from '../../slices/config';
-import {
-  setTestLanguage,
-  setIsTyping,
-  setIsFinished,
-  setIsTestPopupOpen,
-} from '../../slices/typingTest';
-import languages from '../../languages/_list';
+import { setTime, setWords } from '../../slices/config';
+import { setIsTyping, setIsFinished, setIsTestPopupOpen } from '../../slices/typingTest';
 import Styled from './Home.styles';
 
 interface Props {
@@ -26,23 +20,19 @@ interface Props {
 function Home({ setRandomTheme }: Props) {
   const dispatch = useAppDispatch();
   const { commandLine } = useAppSelector(({ app }) => app);
-  const {
-    themeName,
-    mode,
-    time,
-    words,
-    language,
-  } = useAppSelector(({ config }) => config);
+  const { mode, time, words, language } = useAppSelector(({ config }) => config);
   const {
     testLanguage,
+    isRunning,
     isTyping,
     isFinished,
     isTestPopupOpen,
   } = useAppSelector(({ typingTest }) => typingTest);
   const [id, setId] = useState(uniqid());
-  const [customAmount, setCustomAmount] = useState('0');
-  const testId = `${mode}-${mode === 'time' ? time : mode === 'words' ? words : ''}-${language}-${id}`;
-  const restartTestDebounced = useThrottledCallback(() => {
+  const [customAmount, setCustomAmount] = useState(0);
+  const testId = mode + '-' + (mode === 'time' ? time : mode === 'words' ? words : '')
+    + '-' + testLanguage.name.replace(/\s/g, '_') + '-' + id;
+  const restartTest = useThrottledCallback(() => {
     setId(uniqid());
     setRandomTheme();
     dispatch(setIsFinished(false));
@@ -58,15 +48,15 @@ function Home({ setRandomTheme }: Props) {
   const handleTab = (e: KeyboardEvent) => {
     if (e.key === 'Tab') {
       e.preventDefault();
-      restartTestDebounced();
+      restartTest();
     }
   };
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (mode === 'time') {
-      dispatch(setTime(+customAmount));
+      dispatch(setTime(customAmount));
     } else {
-      dispatch(setWords(+customAmount));
+      dispatch(setWords(customAmount));
     }
     dispatch(setIsTestPopupOpen(false));
   };
@@ -78,15 +68,7 @@ function Home({ setRandomTheme }: Props) {
   );
   useEventListener(window, 'keydown', toggleCommandLine);
   useEffect(() => {
-    dispatch(setThemeName(themeName));
-  }, [dispatch, themeName]);
-  useEffect(() => {
-    (async () => {
-      dispatch(setTestLanguage(await getLanguage(language)));
-    })();
-  }, [dispatch, language]);
-  useEffect(() => {
-    setCustomAmount(`${mode === 'time' ? time : words}`);
+    setCustomAmount(mode === 'time' ? time : words);
     dispatch(setIsFinished(false));
   }, [dispatch, mode, time, words, language]);
 
@@ -99,12 +81,27 @@ function Home({ setRandomTheme }: Props) {
             ? <Styled.Wrapper key="result">
               <TestResults />
               <Styled.Buttons>
-                <Button alt title="Next test" onClick={restartTestDebounced}>
+                <Button alt title="Next test" onClick={restartTest}>
                   <RiArrowRightSLine />
                 </Button>
               </Styled.Buttons>
             </Styled.Wrapper>
             : <Styled.Wrapper key={testId}>
+              <AnimatePresence>
+                {!isRunning && (
+                  <Styled.TestButtons>
+                    <Button
+                      text
+                      onClick={() => dispatch(setCommandLine({
+                        isOpen: true,
+                        initial: 'language',
+                      }))}
+                    >
+                      <RiGlobeFill /> {testLanguage.name}
+                    </Button>
+                  </Styled.TestButtons>
+                )}
+              </AnimatePresence>
               <TestStats />
               <TypingTest />
               <Keymap />
@@ -123,7 +120,7 @@ function Home({ setRandomTheme }: Props) {
                   min="0"
                   max={mode === 'time' ? '3600' : '5000'}
                   value={customAmount}
-                  onChange={({ target: { value } }) => setCustomAmount(value)}
+                  onChange={({ target: { value } }) => setCustomAmount(+value)}
                   autoFocus
                 />
                 <div>
@@ -158,12 +155,6 @@ function Home({ setRandomTheme }: Props) {
   );
 }
 
-const languageURL = (lang: string) => `https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/${lang}.json`;
-const getLanguage = async (language: string = languages[0]) => {
-  const reponse = await fetch(languageURL(language));
-  const { name, words } = await reponse.json();
-  return { name, words };
-};
 const getDurationPreview = (seconds: number) => {
   if (!seconds) {
     return 'Infinite test';

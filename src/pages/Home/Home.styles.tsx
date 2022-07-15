@@ -36,9 +36,26 @@ const Wrapper = styled(m.div).attrs(() => ({
   animate: { opacity: 1 },
   exit: { opacity: 0 },
 }))`
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
+`;
+
+const TestButtons = styled(m.div).attrs(() => ({
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+}))`
+  height: 24px;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 `;
 
 const Buttons = styled.div`
@@ -90,6 +107,7 @@ const Styled = {
   Home,
   CustomConfig,
   Wrapper,
+  TestButtons,
   Buttons,
   Bottom,
   Tips,
