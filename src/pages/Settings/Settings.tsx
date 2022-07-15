@@ -1,10 +1,12 @@
 import { useRef } from 'react';
+import { useAppSelector } from '../../app/hooks';
 import { Setting } from '../../components';
 import { Button, Key } from '../../components/ui';
 import configList from '../../config/_list';
 import Styled from './Settings.styles';
 
 function Settings() {
+  const { keyTips } = useAppSelector(({ config }) => config);
   const list = useRef<HTMLDivElement>(null);
   const scrollToCategory = (index: number) => {
     list.current?.children[index].scrollIntoView({
@@ -16,7 +18,7 @@ function Settings() {
   return (
     <Styled.Settings>
       <Styled.Wrapper>
-        <div>
+        <div style={{ display: keyTips === 'show' ? 'block' : 'none' }}>
           pro tip: you can also change all these
           settings quickly using the command line (<Key>esc</Key>)
         </div>

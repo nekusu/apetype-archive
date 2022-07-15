@@ -9,6 +9,12 @@ declare namespace ApeTypes {
     fontFamily: string;
     themeName: string;
     randomTheme: 'off' | 'on' | 'light' | 'dark';
+    timerProgress: 'hide' | 'show';
+    liveWpm: 'hide' | 'show';
+    liveAccuracy: 'hide' | 'show';
+    keyTips: 'hide' | 'show';
+    outOfFocusWarning: 'hide' | 'show';
+    capsLockWarning: 'hide' | 'show';
   }
 
   interface Letter {

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, useIsPresent } from 'framer-motion';
 import useEventListener from 'use-typed-event-listener';
-import { RiCursorFill } from 'react-icons/ri';
+import { RiLockFill, RiCursorFill } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import { setCommandLine } from '../../slices/app';
 import {
   addTestWords,
   checkInput,
@@ -15,9 +16,9 @@ import Styled from './TypingTest.styles';
 
 function TypingTest() {
   const dispatch = useAppDispatch();
-  const { commandLine } = useAppSelector(({ app }) => app);
+  const { commandLine, capsLock } = useAppSelector(({ app }) => app);
   const config = useAppSelector(({ config }) => config);
-  const { mode, words, smoothCaret, caretStyle } = config;
+  const { mode, words, smoothCaret, caretStyle, outOfFocusWarning, capsLockWarning } = config;
   const {
     testLanguage,
     testWords,
@@ -137,7 +138,7 @@ function TypingTest() {
         {isReady && (
           <Styled.Wrapper
             onClick={focusWords}
-            $blurred={isBlurred}
+            $blurred={outOfFocusWarning === 'show' && isBlurred}
           >
             {isFocused && caretStyle !== 'off' && (
               <Styled.Caret
@@ -184,7 +185,16 @@ function TypingTest() {
           </Styled.Wrapper>
         )}
       </AnimatePresence>
-      {isReady && isBlurred && (
+      {capsLockWarning === 'show' && isReady && capsLock && (
+        <Styled.CapsLock onClick={() => dispatch(setCommandLine({
+          isOpen: true,
+          initial: 'capsLockWarning',
+        }))}>
+          <RiLockFill />
+          Caps Lock
+        </Styled.CapsLock>
+      )}
+      {outOfFocusWarning === 'show' && isReady && isBlurred && (
         <Styled.OutOfFocus>
           <RiCursorFill />
           Click or press any key to focus

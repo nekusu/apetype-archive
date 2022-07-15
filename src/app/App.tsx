@@ -2,10 +2,11 @@ import { useCallback, useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, domAnimation, LazyMotion, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from 'styled-components';
+import useEventListener from 'use-typed-event-listener';
 import { useAppDispatch, useAppSelector } from './hooks';
-import { setTheme } from '../slices/app';
+import { setTheme, setCapsLock, setCommandLine } from '../slices/app';
 import { setThemeName } from '../slices/config';
-import { setTestLanguage } from '../slices/typingTest';
+import { setTestLanguage, setIsTestPopupOpen } from '../slices/typingTest';
 import { CommandLine, Header, Footer } from '../components';
 import { Home, Settings } from '../pages';
 import themes from '../themes/_list';
@@ -27,6 +28,16 @@ function App() {
     const newTheme = filteredThemes[Math.floor(Math.random() * filteredThemes.length)];
     dispatch(setThemeName(newTheme.name));
   }, [dispatch, randomTheme, themeName]);
+  const toggleCommandLine = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      dispatch(setCommandLine({ isOpen: !commandLine.isOpen }));
+      dispatch(setIsTestPopupOpen(false));
+    }
+  };
+  const handleCapsLock = (e: KeyboardEvent) => {
+    dispatch(setCapsLock(e.getModifierState('CapsLock')));
+  };
 
   useEffect(() => {
     localStorage.setItem('config', JSON.stringify(config));
@@ -45,6 +56,8 @@ function App() {
       })();
     }
   }, [dispatch, themeName, setRandomTheme]);
+  useEventListener(window, 'keydown', toggleCommandLine);
+  useEventListener(window, 'keyup', handleCapsLock);
 
   return (
     <ThemeProvider theme={{ ...theme, fontFamily }}>

@@ -92,6 +92,49 @@ const config: { [index: string]: ConfigItem; } = {
     options: ['off', 'on', 'light', 'dark'],
     action: actions.setRandomTheme,
   },
+  timerProgress: {
+    command: 'timer/progress',
+    description: 'Displays a live timer for timed tests and progress for words tests.',
+    category: 'hide elements',
+    options: ['hide', 'show'],
+    action: actions.setTimerProgress,
+  },
+  liveWpm: {
+    command: 'live wpm',
+    description: 'Displays a live WPM speed during the test. Updates once every second.',
+    category: 'hide elements',
+    options: ['hide', 'show'],
+    action: actions.setLiveWpm,
+  },
+  liveAccuracy: {
+    command: 'live accuracy',
+    description: 'Displays live accuracy during the test.',
+    category: 'hide elements',
+    options: ['hide', 'show'],
+    action: actions.setLiveAccuracy,
+  },
+  keyTips: {
+    command: 'key tips',
+    description: 'Shows keybind tips across the website.',
+    category: 'hide elements',
+    options: ['hide', 'show'],
+    action: actions.setKeyTips,
+  },
+  outOfFocusWarning: {
+    command: 'out of focus warning',
+    description: 'Shows an out of focus reminder after 1 second of being \'out of focus\'\
+      (not being able to type).',
+    category: 'hide elements',
+    options: ['hide', 'show'],
+    action: actions.setOutOfFocusWarning,
+  },
+  capsLockWarning: {
+    command: 'caps lock warning',
+    description: 'Displays a warning when caps lock is on.',
+    category: 'hide elements',
+    options: ['hide', 'show'],
+    action: actions.setCapsLockWarning,
+  },
 };
 
 export default config;

@@ -9,7 +9,14 @@ import Styled from './TestStats.styles';
 
 function TestStats() {
   const dispatch = useAppDispatch();
-  const { mode, time, words } = useAppSelector(({ config }) => config);
+  const {
+    mode,
+    time,
+    words,
+    timerProgress,
+    liveWpm,
+    liveAccuracy,
+  } = useAppSelector(({ config }) => config);
   const {
     wordIndex,
     characterCount,
@@ -66,7 +73,7 @@ function TestStats() {
       <AnimatePresence>
         {(isRunning || isFinished) && (
           <Styled.TestStats>
-            {mode === 'time'
+            {timerProgress === 'show' && (mode === 'time'
               ? <div>{absTimer}</div>
               : mode === 'words' || mode === 'zen'
                 ? <div>
@@ -74,9 +81,9 @@ function TestStats() {
                   {mode !== 'zen' && words ? '/' + words : ''}
                 </div>
                 : null
-            }
-            <div>{intWpm}</div>
-            <div>{intAccuracy}%</div>
+            )}
+            {liveWpm === 'show' && <div>{intWpm}</div>}
+            {liveAccuracy === 'show' && <div>{intAccuracy}%</div>}
           </Styled.TestStats>
         )}
       </AnimatePresence>

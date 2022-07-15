@@ -20,10 +20,15 @@ interface Props {
 function Home({ setRandomTheme }: Props) {
   const dispatch = useAppDispatch();
   const { commandLine } = useAppSelector(({ app }) => app);
-  const { mode, time, words, language } = useAppSelector(({ config }) => config);
+  const {
+    mode,
+    time,
+    words,
+    language,
+    keyTips,
+  } = useAppSelector(({ config }) => config);
   const {
     testLanguage,
-    isRunning,
     isTyping,
     isFinished,
     isTestPopupOpen,
@@ -38,13 +43,6 @@ function Home({ setRandomTheme }: Props) {
     dispatch(setIsFinished(false));
     dispatch(setIsTyping(false));
   }, 400, { trailing: false });
-  const toggleCommandLine = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      dispatch(setCommandLine({ isOpen: !commandLine.isOpen }));
-      dispatch(setIsTestPopupOpen(false));
-    }
-  };
   const handleTab = (e: KeyboardEvent) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -66,7 +64,6 @@ function Home({ setRandomTheme }: Props) {
     'keydown',
     handleTab,
   );
-  useEventListener(window, 'keydown', toggleCommandLine);
   useEffect(() => {
     setCustomAmount(mode === 'time' ? time : words);
     dispatch(setIsFinished(false));
@@ -88,7 +85,7 @@ function Home({ setRandomTheme }: Props) {
             </Styled.Wrapper>
             : <Styled.Wrapper key={testId}>
               <AnimatePresence>
-                {!isRunning && (
+                {!isTyping && (
                   <Styled.TestButtons>
                     <Button
                       text
@@ -134,13 +131,15 @@ function Home({ setRandomTheme }: Props) {
         )}
         {!isTyping && (
           <Styled.Bottom key="bottom">
-            <Styled.Tips>
-              {(mode === 'zen' || mode === 'words' && !words || mode === 'time' && !time) && (
-                <div><Key>shift</Key> + <Key>enter</Key> - stop test</div>
-              )}
-              <div><Key>tab</Key> - restart test</div>
-              <div><Key>esc</Key> - command line</div>
-            </Styled.Tips>
+            {keyTips === 'show' && (
+              <Styled.Tips>
+                {(mode === 'zen' || mode === 'words' && !words || mode === 'time' && !time) && (
+                  <div><Key>shift</Key> + <Key>enter</Key> - stop test</div>
+                )}
+                <div><Key>tab</Key> - restart test</div>
+                <div><Key>esc</Key> - command line</div>
+              </Styled.Tips>
+            )}
             <Styled.CommandLineButton
               title="Command line"
               active

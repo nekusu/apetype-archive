@@ -10,6 +10,12 @@ const defaultConfig = {
   fontFamily: 'Lexend Deca',
   themeName: '',
   randomTheme: 'on',
+  timerProgress: 'show',
+  liveWpm: 'show',
+  liveAccuracy: 'show',
+  keyTips: 'show',
+  outOfFocusWarning: 'show',
+  capsLockWarning: 'show',
 };
 const savedConfig = localStorage.getItem('config');
 const initialState: ApeTypes.Config = savedConfig
@@ -53,6 +59,24 @@ const slice = createSlice({
     setRandomTheme: (state, action: PayloadAction<ApeTypes.Config['randomTheme']>) => {
       state.randomTheme = action.payload;
     },
+    setTimerProgress: (state, action: PayloadAction<ApeTypes.Config['timerProgress']>) => {
+      state.timerProgress = action.payload;
+    },
+    setLiveWpm: (state, action: PayloadAction<ApeTypes.Config['liveWpm']>) => {
+      state.liveWpm = action.payload;
+    },
+    setLiveAccuracy: (state, action: PayloadAction<ApeTypes.Config['liveAccuracy']>) => {
+      state.liveAccuracy = action.payload;
+    },
+    setKeyTips: (state, action: PayloadAction<ApeTypes.Config['keyTips']>) => {
+      state.keyTips = action.payload;
+    },
+    setOutOfFocusWarning: (state, action: PayloadAction<ApeTypes.Config['outOfFocusWarning']>) => {
+      state.outOfFocusWarning = action.payload;
+    },
+    setCapsLockWarning: (state, action: PayloadAction<ApeTypes.Config['capsLockWarning']>) => {
+      state.capsLockWarning = action.payload;
+    },
   },
 });
 
@@ -66,5 +90,11 @@ export const {
   setFontFamily,
   setThemeName,
   setRandomTheme,
+  setTimerProgress,
+  setLiveWpm,
+  setLiveAccuracy,
+  setKeyTips,
+  setOutOfFocusWarning,
+  setCapsLockWarning,
 } = slice.actions;
 export default slice.reducer;

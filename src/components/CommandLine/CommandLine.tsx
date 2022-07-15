@@ -92,6 +92,7 @@ function CommandLine() {
   }, [inputValue, selected, selectedValue]);
   useLayoutEffect(() => {
     input.current?.focus();
+    setIsUsingKeyboard(true);
     setInputValue('');
   }, [selected]);
   useEffect(() => {
@@ -102,7 +103,7 @@ function CommandLine() {
   }, [activeIndex, selected, selectedOptions, setThemeDebounced]);
   useEffect(() => {
     (list.current?.children[activeIndex] as HTMLDivElement)
-      ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      ?.scrollIntoView({ block: 'nearest' });
   }, [activeIndex]);
   useEffect(() => {
     if (selected === 'themeName' && !isPresent) {
@@ -130,7 +131,12 @@ function CommandLine() {
             autoFocus
           />
         </form>
-        <Button text title="Settings" navigate="/settings">
+        <Button
+          text
+          title="Settings"
+          onClick={() => dispatch(setCommandLine({ isOpen: false }))}
+          navigate="/settings"
+        >
           <RiSettingsLine />
         </Button>
       </Styled.SearchBar>
@@ -183,7 +189,7 @@ function CommandLine() {
 }
 
 const filterValue = (value: string) => {
-  return value.replace(/[^a-zA-Z0-9\s_-]+/gi, '');
+  return value.replace(/[^a-zA-Z0-9\s-/]+/gi, '');
 };
 
 export default CommandLine;

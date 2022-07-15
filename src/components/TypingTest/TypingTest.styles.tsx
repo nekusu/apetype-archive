@@ -1,5 +1,6 @@
 import { m } from 'framer-motion';
 import styled from 'styled-components';
+import { Button } from '../../components/ui';
 
 const TypingTest = styled(m.div).attrs(() => ({
   initial: { opacity: 0 },
@@ -37,6 +38,18 @@ const OutOfFocus = styled(m.div).attrs(() => ({
   color: ${p => p.theme.text};
   pointer-events: none;
   transition-property: color;
+`;
+
+const CapsLock = styled(Button).attrs(() => ({
+  active: true,
+}))`
+  width: fit-content;
+  margin-inline: auto;
+  padding: 12px 14px;
+  position: absolute;
+  top: -106px;
+  left: 0;
+  right: 0;
 `;
 
 const Wrapper = styled.div<{ $blurred: boolean; }>`
@@ -97,6 +110,7 @@ const Styled = {
   TypingTest,
   Input,
   OutOfFocus,
+  CapsLock,
   Wrapper,
   Caret,
   Words,

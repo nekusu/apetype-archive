@@ -8,6 +8,7 @@ interface State {
     isOpen: boolean;
     initial: string;
   };
+  capsLock: boolean;
 }
 
 const initialState: State = {
@@ -16,6 +17,7 @@ const initialState: State = {
     isOpen: false,
     initial: '',
   },
+  capsLock: false,
 };
 
 const slice = createSlice({
@@ -32,11 +34,15 @@ const slice = createSlice({
         initial: initial || '',
       };
     },
+    setCapsLock: (state, action: PayloadAction<boolean>) => {
+      state.capsLock = action.payload;
+    },
   },
 });
 
 export const {
   setTheme,
   setCommandLine,
+  setCapsLock,
 } = slice.actions;
 export default slice.reducer;
