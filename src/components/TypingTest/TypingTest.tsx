@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, useIsPresent } from 'framer-motion';
 import useEventListener from 'use-typed-event-listener';
+import useSound from 'use-sound';
 import { RiLockFill, RiCursorFill } from 'react-icons/ri';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { setCommandLine } from '../../slices/app';
@@ -12,18 +13,30 @@ import {
   startTest,
   resetTest,
 } from '../../slices/typingTest';
+import sounds from '../../sounds/_list';
 import Styled from './TypingTest.styles';
 
 function TypingTest() {
   const dispatch = useAppDispatch();
   const { commandLine, capsLock } = useAppSelector(({ app }) => app);
   const config = useAppSelector(({ config }) => config);
-  const { mode, words, smoothCaret, caretStyle, outOfFocusWarning, capsLockWarning } = config;
+  const {
+    mode,
+    words,
+    soundVolume,
+    soundOnClick,
+    soundOnError,
+    smoothCaret,
+    caretStyle,
+    outOfFocusWarning,
+    capsLockWarning,
+  } = config;
   const {
     testLanguage,
     testWords,
     wordIndex,
     inputValue,
+    errorCount,
     isReady,
     isRunning,
     isTyping,
@@ -32,6 +45,13 @@ function TypingTest() {
   const [isFocused, setIsFocused] = useState(false);
   const [isBlurred, setIsBlurred] = useState(true);
   const [caretPosition, setCaretPosition] = useState({ x: 0, y: 0 });
+  const url = sounds[soundOnClick]?.url;
+  const sprite = sounds[soundOnClick]?.sprite;
+  const [playClickSound, { sound: clickSound }] = useSound(
+    `${process.env.PUBLIC_URL}/assets/sounds/${url ?? 'click.wav'}`,
+    { sprite },
+  );
+  const [playErrorSound, { sound: errorSound }] = useSound(`${process.env.PUBLIC_URL}/assets/sounds/error.wav`);
   const isPresent = useIsPresent();
   const input = useRef<HTMLInputElement>(null);
   const currentWord = useRef<HTMLDivElement>(null);
@@ -79,12 +99,11 @@ function TypingTest() {
     clearTimeout(typingTimeout.current);
     typingTimeout.current = setTimeout(() => dispatch(setIsTyping(false)), 1000);
   };
+  const playKeySound = () => {
+    const randomId = Math.floor(Math.random() * Object.keys(sprite).length);
+    playClickSound({ id: randomId.toString() });
+  };
 
-  useEventListener(
-    !commandLine.isOpen && !isTestPopupOpen && !isFocused ? window : null,
-    'keydown',
-    handleKeyDown,
-  );
   useEffect(() => {
     dispatch(resetTest());
     if (mode === 'words' && words > 0) {
@@ -125,6 +144,25 @@ function TypingTest() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [testWords, caretPosition.y]);
+  useEffect(() => {
+    clickSound?.volume(soundVolume);
+    errorSound?.volume(soundVolume);
+  }, [soundVolume, clickSound, errorSound]);
+  useEffect(() => {
+    if (soundOnError === 'on' && isRunning && errorCount > 0) {
+      playErrorSound();
+    }
+  }, [soundOnError, errorCount, isRunning, playErrorSound]);
+  useEventListener(
+    !commandLine.isOpen && !isTestPopupOpen && !isFocused ? window : null,
+    'keydown',
+    handleKeyDown,
+  );
+  useEventListener(
+    soundOnClick !== 'off' && isFocused ? window : null,
+    'keydown',
+    playKeySound,
+  );
 
   return (
     <Styled.TypingTest>

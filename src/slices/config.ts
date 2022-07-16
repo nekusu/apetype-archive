@@ -5,6 +5,9 @@ const defaultConfig = {
   time: 15,
   words: 10,
   language: 'english',
+  soundVolume: 0.6,
+  soundOnClick: 'nk creams',
+  soundOnError: 'on',
   smoothCaret: 'on',
   caretStyle: 'default',
   fontFamily: 'Lexend Deca',
@@ -43,6 +46,15 @@ const slice = createSlice({
     },
     setLanguage: (state, action: PayloadAction<ApeTypes.Config['language']>) => {
       state.language = action.payload;
+    },
+    setSoundVolume: (state, action: PayloadAction<ApeTypes.Config['soundVolume']>) => {
+      state.soundVolume = action.payload;
+    },
+    setSoundOnClick: (state, action: PayloadAction<ApeTypes.Config['soundOnClick']>) => {
+      state.soundOnClick = action.payload;
+    },
+    setSoundOnError: (state, action: PayloadAction<ApeTypes.Config['soundOnError']>) => {
+      state.soundOnError = action.payload;
     },
     setSmoothCaret: (state, action: PayloadAction<ApeTypes.Config['smoothCaret']>) => {
       state.smoothCaret = action.payload;
@@ -85,6 +97,9 @@ export const {
   setTime,
   setWords,
   setLanguage,
+  setSoundVolume,
+  setSoundOnClick,
+  setSoundOnError,
   setSmoothCaret,
   setCaretStyle,
   setFontFamily,

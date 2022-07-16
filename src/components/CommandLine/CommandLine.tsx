@@ -152,7 +152,10 @@ function CommandLine() {
                 $active={index === activeIndex}
                 $selected={selectedValue === option}
               >
-                {option}
+                {configList[selected].showAltOptions
+                  ? configList[selected].altOptions?.[index]
+                  : option
+                }
                 <RiCheckLine />
               </Styled.Item>
             ))}

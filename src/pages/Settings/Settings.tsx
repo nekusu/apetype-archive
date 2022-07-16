@@ -40,6 +40,7 @@ function Settings() {
                     key={name}
                     name={name}
                     commandLine={commandLineNames.includes(name)}
+                    buttonRows={name === 'soundOnClick' ? 2 : 0}
                   />
                 ))}
             </Styled.Group>

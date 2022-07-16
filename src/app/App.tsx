@@ -4,13 +4,12 @@ import { AnimatePresence, domAnimation, LazyMotion, MotionConfig } from 'framer-
 import { ThemeProvider } from 'styled-components';
 import useEventListener from 'use-typed-event-listener';
 import { useAppDispatch, useAppSelector } from './hooks';
-import { setTheme, setCapsLock, setCommandLine } from '../slices/app';
+import { setTheme, setCommandLine, setCapsLock } from '../slices/app';
 import { setThemeName } from '../slices/config';
 import { setTestLanguage, setIsTestPopupOpen } from '../slices/typingTest';
 import { CommandLine, Header, Footer } from '../components';
 import { Home, Settings } from '../pages';
 import themes from '../themes/_list';
-import languages from '../languages/_list';
 import Styled, { GlobalStyle } from './App.styles';
 
 function App() {
@@ -29,11 +28,10 @@ function App() {
     dispatch(setThemeName(newTheme.name));
   }, [dispatch, randomTheme, themeName]);
   const toggleCommandLine = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      dispatch(setCommandLine({ isOpen: !commandLine.isOpen }));
-      dispatch(setIsTestPopupOpen(false));
-    }
+    if (e.key !== 'Escape') return;
+    e.preventDefault();
+    dispatch(setCommandLine({ isOpen: !commandLine.isOpen }));
+    dispatch(setIsTestPopupOpen(false));
   };
   const handleCapsLock = (e: KeyboardEvent) => {
     dispatch(setCapsLock(e.getModifierState('CapsLock')));
@@ -44,7 +42,9 @@ function App() {
   }, [config]);
   useEffect(() => {
     (async () => {
-      dispatch(setTestLanguage(await getLanguage(language)));
+      const reponse = await fetch(languageURL(language));
+      const { words } = await reponse.json();
+      dispatch(setTestLanguage({ name: language, words }));
     })();
   }, [dispatch, language]);
   useEffect(() => {
@@ -52,7 +52,8 @@ function App() {
       setRandomTheme();
     } else {
       (async () => {
-        dispatch(setTheme((await import(`../themes/${themeName}.ts`)).default));
+        const colors = (await import(`../themes/${themeName}.ts`)).default;
+        dispatch(setTheme(colors));
       })();
     }
   }, [dispatch, themeName, setRandomTheme]);
@@ -87,9 +88,5 @@ function App() {
 
 const languageURL = (lang: string) => `https://raw.githubusercontent.com/monkeytypegame/
 monkeytype/master/frontend/static/languages/${lang.replace(/\s/g, '_')}.json`;
-const getLanguage = async (language: string = languages[0]) => {
-  const reponse = await fetch(languageURL(language));
-  const { words } = await reponse.json();
-  return { name: language, words };
-};
+
 export default App;

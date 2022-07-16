@@ -9,6 +9,7 @@ interface ConfigItem {
   category?: string;
   options: (string | number)[];
   altOptions?: (string | number)[];
+  showAltOptions?: boolean;
   custom?: boolean;
   action: (arg: any) => any;
 }
@@ -37,6 +38,29 @@ const config: { [index: string]: ConfigItem; } = {
     category: 'behavior',
     options: languages,
     action: actions.setLanguage,
+  },
+  soundVolume: {
+    command: 'sound volume',
+    description: 'Change the volume of the sound effects.',
+    category: 'sound',
+    options: [0.2, 0.6, 1],
+    altOptions: ['quiet', 'medium', 'loud'],
+    showAltOptions: true,
+    action: actions.setSoundVolume,
+  },
+  soundOnClick: {
+    command: 'sound on click',
+    description: 'Plays a short sound when you press a key.',
+    category: 'sound',
+    options: ['off', 'click', 'beep', 'pop', 'nk creams', 'typewriter', 'osu', 'hitmarker'],
+    action: actions.setSoundOnClick,
+  },
+  soundOnError: {
+    command: 'sound on error',
+    description: 'Plays a short sound if you press an incorrect key or press space too early.',
+    category: 'sound',
+    options: ['off', 'on'],
+    action: actions.setSoundOnError,
   },
   smoothCaret: {
     command: 'smooth caret',

@@ -4,6 +4,9 @@ declare namespace ApeTypes {
     time: number;
     words: number;
     language: string;
+    soundVolume: number;
+    soundOnClick: 'off' | 'click' | 'beep' | 'pop' | 'nk creams' | 'typewriter' | 'osu' | 'hitmarker';
+    soundOnError: 'off' | 'on';
     smoothCaret: 'off' | 'on';
     caretStyle: 'off' | 'default' | 'block' | 'outline' | 'underline';
     fontFamily: string;
