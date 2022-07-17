@@ -94,8 +94,14 @@ const Word = styled.div<{ $error: boolean; }>`
   transition: border-color 0.1s ease-out;
 `;
 
-const Letter = styled.span<{ $status: ApeTypes.Letter['status']; }>`
+const Letter = styled.span<{
+  $status: ApeTypes.Letter['status'];
+  $hidden: boolean;
+}>`
+  width: ${p => p.$hidden ? 0 : 'auto'};
+  position: relative;
   display: inline-block;
+  visibility: ${p => p.$hidden ? 'hidden' : 'visible'};
   color: ${p => p.$status === 'correct'
     ? p.theme.main
     : p.$status === 'incorrect'
@@ -103,6 +109,19 @@ const Letter = styled.span<{ $status: ApeTypes.Letter['status']; }>`
       : p.$status === 'extra'
         ? p.theme.colorfulErrorExtra
         : p.theme.sub};
+  transition: color 0.1s ease-out;
+`;
+
+const Typo = styled.span`
+  width: 100%;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  top: 90%;
+  left: 0;
+  font-size: 18px;
+  color: ${p => p.theme.text};
+  opacity: 0.5;
   transition: color 0.1s ease-out;
 `;
 
@@ -116,6 +135,7 @@ const Styled = {
   Words,
   Word,
   Letter,
+  Typo,
 };
 
 export default Styled;

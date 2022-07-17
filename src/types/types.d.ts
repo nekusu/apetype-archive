@@ -4,6 +4,11 @@ declare namespace ApeTypes {
     time: number;
     words: number;
     language: string;
+    freedomMode: 'off' | 'on';
+    confidenceMode: 'off' | 'on' | 'max';
+    quickEnd: 'off' | 'on';
+    indicateTypos: 'off' | 'below' | 'replace';
+    hideExtraLetters: 'off' | 'on';
     soundVolume: number;
     soundOnClick: 'off' | 'click' | 'beep' | 'pop' | 'nk creams' | 'typewriter' | 'osu' | 'hitmarker';
     soundOnError: 'off' | 'on';

@@ -39,6 +39,46 @@ const config: { [index: string]: ConfigItem; } = {
     options: languages,
     action: actions.setLanguage,
   },
+  freedomMode: {
+    command: 'freedom mode',
+    description: 'Allows you to delete any word, even if it was typed correctly.',
+    category: 'input',
+    options: ['off', 'on'],
+    action: actions.setFreedomMode,
+  },
+  confidenceMode: {
+    command: 'confidence mode',
+    description: 'When enabled, you will not be able to go back to previous words to fix mistakes.\
+      When turned up to the max, you won\'t be able to backspace at all.',
+    category: 'input',
+    options: ['off', 'on', 'max'],
+    action: actions.setConfidenceMode,
+  },
+  quickEnd: {
+    command: 'quick end',
+    description: 'This only applies to the words mode - when enabled, the test will end as soon\
+      as the last word has been typed, even if it\'s incorrect. When disabled, you need to\
+      manually confirm the last incorrect entry with a space.',
+    category: 'input',
+    options: ['off', 'on'],
+    action: actions.setQuickEnd,
+  },
+  indicateTypos: {
+    command: 'indicate typos',
+    description: 'Shows typos that you\'ve made. Below shows what you typed below the letters and\
+      replace will replace the letters with the ones you typed.',
+    category: 'input',
+    options: ['off', 'below', 'replace'],
+    action: actions.setIndicateTypos,
+  },
+  hideExtraLetters: {
+    command: 'hide extra letters',
+    description: 'Hides extra letters. This will completely avoid words jumping lines (due to\
+      changing width), but might feel a bit confusing when you press a key and nothing happens.',
+    category: 'input',
+    options: ['off', 'on'],
+    action: actions.setHideExtraLetters,
+  },
   soundVolume: {
     command: 'sound volume',
     description: 'Change the volume of the sound effects.',

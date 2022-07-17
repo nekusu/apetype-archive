@@ -5,6 +5,11 @@ const defaultConfig = {
   time: 15,
   words: 10,
   language: 'english',
+  freedomMode: 'off',
+  confidenceMode: 'off',
+  quickEnd: 'on',
+  indicateTypos: 'replace',
+  hideExtraLetters: 'off',
   soundVolume: 0.6,
   soundOnClick: 'nk creams',
   soundOnError: 'on',
@@ -46,6 +51,21 @@ const slice = createSlice({
     },
     setLanguage: (state, action: PayloadAction<ApeTypes.Config['language']>) => {
       state.language = action.payload;
+    },
+    setFreedomMode: (state, action: PayloadAction<ApeTypes.Config['freedomMode']>) => {
+      state.freedomMode = action.payload;
+    },
+    setConfidenceMode: (state, action: PayloadAction<ApeTypes.Config['confidenceMode']>) => {
+      state.confidenceMode = action.payload;
+    },
+    setQuickEnd: (state, action: PayloadAction<ApeTypes.Config['quickEnd']>) => {
+      state.quickEnd = action.payload;
+    },
+    setIndicateTypos: (state, action: PayloadAction<ApeTypes.Config['indicateTypos']>) => {
+      state.indicateTypos = action.payload;
+    },
+    setHideExtraLetters: (state, action: PayloadAction<ApeTypes.Config['hideExtraLetters']>) => {
+      state.hideExtraLetters = action.payload;
     },
     setSoundVolume: (state, action: PayloadAction<ApeTypes.Config['soundVolume']>) => {
       state.soundVolume = action.payload;
@@ -97,6 +117,11 @@ export const {
   setTime,
   setWords,
   setLanguage,
+  setFreedomMode,
+  setConfidenceMode,
+  setQuickEnd,
+  setIndicateTypos,
+  setHideExtraLetters,
   setSoundVolume,
   setSoundOnClick,
   setSoundOnError,

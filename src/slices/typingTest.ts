@@ -77,7 +77,7 @@ const slice = createSlice({
     },
     checkInput: (state, action: PayloadAction<{ value: string, config: ApeTypes.Config; }>) => {
       const { value, config } = action.payload;
-      const { mode } = config;
+      const { mode, words, freedomMode, confidenceMode, quickEnd } = config;
       const trimmedValue = value.trim();
       const typedLetters = [...trimmedValue];
       const emptyWord = {
@@ -122,7 +122,7 @@ const slice = createSlice({
         if (typedLetter) return;
         if (mode === 'zen' || letter.status === 'extra') {
           letters.pop();
-        } else {
+        } else if (confidenceMode !== 'max') {
           letter.typed = '';
           letter.status = undefined;
         }
@@ -134,6 +134,11 @@ const slice = createSlice({
         isCorrect: mode === 'zen' || word.original === trimmedValue,
         letters,
       };
+
+      if (mode === 'words' && quickEnd === 'on' && state.wordIndex === words - 1 &&
+        trimmedValue.length === word.original.length) {
+        state.wordIndex++;
+      }
 
       if (!value) {
         state.inputValue = ' ';
@@ -148,10 +153,12 @@ const slice = createSlice({
               letter.status = undefined;
             }
           });
-          state.inputValue += previousWord.typed;
-          state.wordIndex--;
+          if (freedomMode === 'on' || confidenceMode === 'off' && !previousWord.isCorrect) {
+            state.inputValue += previousWord.typed;
+            state.wordIndex--;
+          }
         }
-      } else if (value.endsWith(' ')) {
+      } else if (value.length > 1 && value.endsWith(' ')) {
         state.inputValue = ' ';
         if (value.length > 2) {
           const nextWord = state.testWords[state.wordIndex + 1];
@@ -173,7 +180,7 @@ const slice = createSlice({
           }
           state.wordIndex++;
         }
-      } else {
+      } else if (confidenceMode !== 'max' || value.length >= state.inputValue.length) {
         state.inputValue = value;
       }
     },

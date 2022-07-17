@@ -23,6 +23,8 @@ function TypingTest() {
   const {
     mode,
     words,
+    indicateTypos,
+    hideExtraLetters,
     soundVolume,
     soundOnClick,
     soundOnError,
@@ -208,13 +210,16 @@ function TypingTest() {
                 >
                   {letters.map((letter, i) => (
                     <Styled.Letter
-                      ref={wordIndex === index &&
-                        ((typed?.length || 0) - 1) === i
+                      ref={wordIndex === index && (typed?.length || 0) - 1 === i
                         ? currentLetter : null}
                       key={i}
                       $status={letter.status}
+                      $hidden={hideExtraLetters === 'on' && letter.status === 'extra'}
                     >
-                      {letter.typed || letter.original}
+                      {indicateTypos === 'replace' && letter.typed || letter.original}
+                      {indicateTypos === 'below' && letter.status === 'incorrect' && (
+                        <Styled.Typo>{letter.typed}</Styled.Typo>
+                      )}
                     </Styled.Letter>
                   ))}
                 </Styled.Word>
