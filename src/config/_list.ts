@@ -147,13 +147,29 @@ const config: { [index: string]: ConfigItem; } = {
     options: themes.map((t) => t.name),
     action: actions.setThemeName,
   },
+  flipTestColors: {
+    command: 'flip test colors',
+    description: 'By default, typed text is brighter than the future text. When enabled, the\
+      colors will be flipped and the future text will be brighter than the already typed text.',
+    category: 'theme',
+    options: ['off', 'on'],
+    action: actions.setFlipTestColors,
+  },
+  colorfulMode: {
+    command: 'colorful mode',
+    description: 'When enabled, the test words will use the main color, instead of the text\
+      color, making the website more colorful.',
+    category: 'theme',
+    options: ['off', 'on'],
+    action: actions.setColorfulMode,
+  },
   randomTheme: {
     command: 'randomize theme',
-    description: 'After loading a new test, the theme will be set to a random one.\
-      If set to "light" or "dark", only presets with light or dark background colors\
-      will be randomized, respectively.',
+    description: 'After loading a new test, the theme will be set to a random one. If set to\
+      "favorite" only favorite themes will be randomized. If set to "light" or "dark", only\
+      presets with light or dark background colors will be randomized, respectively.',
     category: 'theme',
-    options: ['off', 'on', 'light', 'dark'],
+    options: ['off', 'on', 'favorite', 'light', 'dark'],
     action: actions.setRandomTheme,
   },
   timerProgress: {

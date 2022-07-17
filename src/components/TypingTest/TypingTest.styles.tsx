@@ -95,6 +95,8 @@ const Word = styled.div<{ $error: boolean; }>`
 `;
 
 const Letter = styled.span<{
+  $flipColors: boolean;
+  $colorful: boolean;
   $status: ApeTypes.Letter['status'];
   $hidden: boolean;
 }>`
@@ -102,13 +104,21 @@ const Letter = styled.span<{
   position: relative;
   display: inline-block;
   visibility: ${p => p.$hidden ? 'hidden' : 'visible'};
-  color: ${p => p.$status === 'correct'
-    ? p.theme.main
-    : p.$status === 'incorrect'
-      ? p.theme.colorfulError
-      : p.$status === 'extra'
-        ? p.theme.colorfulErrorExtra
-        : p.theme.sub};
+  color: ${p => {
+    const { main, sub, text, error, errorExtra, colorfulError, colorfulErrorExtra } = p.theme;
+    switch (p.$status) {
+      case 'correct':
+        if (p.$flipColors) return sub;
+        return p.$colorful ? main : text;
+      case 'incorrect':
+        return p.$colorful ? colorfulError : error;
+      case 'extra':
+        return p.$colorful ? colorfulErrorExtra : errorExtra;
+      default:
+        if (p.$flipColors) return p.$colorful ? main : text;
+        return sub;
+    }
+  }};
   transition: color 0.1s ease-out;
 `;
 

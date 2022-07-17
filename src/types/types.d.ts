@@ -16,7 +16,10 @@ declare namespace ApeTypes {
     caretStyle: 'off' | 'default' | 'block' | 'outline' | 'underline';
     fontFamily: string;
     themeName: string;
-    randomTheme: 'off' | 'on' | 'light' | 'dark';
+    flipTestColors: 'off' | 'on';
+    colorfulMode: 'off' | 'on';
+    randomTheme: 'off' | 'on' | 'favorite' | 'light' | 'dark';
+    favoriteThemes: string[];
     timerProgress: 'hide' | 'show';
     liveWpm: 'hide' | 'show';
     liveAccuracy: 'hide' | 'show';

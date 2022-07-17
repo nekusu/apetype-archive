@@ -16,17 +16,21 @@ function App() {
   const dispatch = useAppDispatch();
   const { theme, commandLine } = useAppSelector(({ app }) => app);
   const config = useAppSelector(({ config }) => config);
-  const { language, fontFamily, themeName, randomTheme } = config;
+  const { language, fontFamily, themeName, randomTheme, favoriteThemes } = config;
   const location = useLocation();
   const setRandomTheme = useCallback(async () => {
     if (randomTheme === 'off') return;
     let filteredThemes = themes.filter((t) => t.name !== themeName);
     if (randomTheme === 'light' || randomTheme === 'dark') {
       filteredThemes = filteredThemes.filter((t) => t.mode === randomTheme);
+    } else if (randomTheme === 'favorite') {
+      filteredThemes = filteredThemes.filter((t) => favoriteThemes.includes(t.name));
     }
     const newTheme = filteredThemes[Math.floor(Math.random() * filteredThemes.length)];
-    dispatch(setThemeName(newTheme.name));
-  }, [dispatch, randomTheme, themeName]);
+    if (newTheme) {
+      dispatch(setThemeName(newTheme.name));
+    }
+  }, [dispatch, randomTheme, themeName, favoriteThemes]);
   const toggleCommandLine = (e: KeyboardEvent) => {
     if (e.key !== 'Escape') return;
     e.preventDefault();

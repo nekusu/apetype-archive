@@ -46,9 +46,9 @@ const List = styled.div`
 const Item = styled.div<{ $active: boolean; $selected?: boolean; }>`
   height: 36px;
   padding-inline: 16px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
-  justify-content: space-between;
   font-family: inherit;
   background-color: ${p => p.$active && p.$selected ? p.theme.text : p.$active ? p.theme.main : 'transparent'};
   color: ${p => p.$active ? p.theme.bg : p.$selected ? p.theme.text : p.theme.sub};
@@ -56,8 +56,8 @@ const Item = styled.div<{ $active: boolean; $selected?: boolean; }>`
   transition-property: background-color, color;
   transition-duration: 0.1s;
 
-  >*:last-child:not(#key) {
-    display: ${p => p.$selected ? 'block' : 'none'};
+  >*:last-child {
+    margin-left: 12px;
   }
 
   #key {
@@ -71,6 +71,8 @@ const Item = styled.div<{ $active: boolean; $selected?: boolean; }>`
 
   span {
     margin-right: 1px;
+    display: flex;
+    align-items: center;
   }
 `;
 

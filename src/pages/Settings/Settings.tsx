@@ -40,7 +40,8 @@ function Settings() {
                     key={name}
                     name={name}
                     commandLine={commandLineNames.includes(name)}
-                    buttonRows={name === 'soundOnClick' ? 2 : 0}
+                    buttonRows={name === 'soundOnClick' ? 2 :
+                      name === 'randomTheme' ? 1 : 0}
                   />
                 ))}
             </Styled.Group>

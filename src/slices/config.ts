@@ -17,6 +17,9 @@ const defaultConfig = {
   caretStyle: 'default',
   fontFamily: 'Lexend Deca',
   themeName: '',
+  flipTestColors: 'off',
+  colorfulMode: 'on',
+  favoriteThemes: [],
   randomTheme: 'on',
   timerProgress: 'show',
   liveWpm: 'show',
@@ -88,6 +91,18 @@ const slice = createSlice({
     setThemeName: (state, action: PayloadAction<ApeTypes.Config['themeName']>) => {
       state.themeName = action.payload;
     },
+    setFlipTestColors: (state, action: PayloadAction<ApeTypes.Config['flipTestColors']>) => {
+      state.flipTestColors = action.payload;
+    },
+    setColorfulMode: (state, action: PayloadAction<ApeTypes.Config['colorfulMode']>) => {
+      state.colorfulMode = action.payload;
+    },
+    addFavoriteTheme: (state, action: PayloadAction<ApeTypes.Config['themeName']>) => {
+      state.favoriteThemes = [...state.favoriteThemes, action.payload];
+    },
+    removeFavoriteTheme: (state, action: PayloadAction<ApeTypes.Config['themeName']>) => {
+      state.favoriteThemes = state.favoriteThemes.filter((theme) => theme !== action.payload);
+    },
     setRandomTheme: (state, action: PayloadAction<ApeTypes.Config['randomTheme']>) => {
       state.randomTheme = action.payload;
     },
@@ -129,6 +144,10 @@ export const {
   setCaretStyle,
   setFontFamily,
   setThemeName,
+  setFlipTestColors,
+  setColorfulMode,
+  addFavoriteTheme,
+  removeFavoriteTheme,
   setRandomTheme,
   setTimerProgress,
   setLiveWpm,

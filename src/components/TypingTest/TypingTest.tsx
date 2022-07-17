@@ -30,6 +30,8 @@ function TypingTest() {
     soundOnError,
     smoothCaret,
     caretStyle,
+    flipTestColors,
+    colorfulMode,
     outOfFocusWarning,
     capsLockWarning,
   } = config;
@@ -213,6 +215,8 @@ function TypingTest() {
                       ref={wordIndex === index && (typed?.length || 0) - 1 === i
                         ? currentLetter : null}
                       key={i}
+                      $flipColors={flipTestColors === 'on'}
+                      $colorful={colorfulMode === 'on'}
                       $status={letter.status}
                       $hidden={hideExtraLetters === 'on' && letter.status === 'extra'}
                     >

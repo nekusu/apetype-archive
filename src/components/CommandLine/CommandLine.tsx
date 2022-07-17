@@ -1,9 +1,16 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useIsPresent } from 'framer-motion';
 import { useDebouncedCallback } from 'use-debounce';
-import { RiTerminalLine, RiCheckLine, RiSettingsLine } from 'react-icons/ri';
+import {
+  RiTerminalLine,
+  RiCheckLine,
+  RiSettingsLine,
+  RiStarLine,
+  RiStarFill,
+} from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { setTheme, setCommandLine } from '../../slices/app';
+import { addFavoriteTheme, removeFavoriteTheme } from '../../slices/config';
 import { Button, Key, Popup } from '../ui';
 import configList from '../../config/_list';
 import Styled from './CommandLine.styles';
@@ -21,7 +28,7 @@ function CommandLine() {
   const isPresent = useIsPresent();
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLDivElement>(null);
-  const selectedValue = config[selected as keyof typeof config];
+  const selectedValue = config[selected as keyof Omit<typeof config, 'favoriteThemes'>];
   const setThemeDebounced = useDebouncedCallback(async (themeName) => {
     if (!isPresent) return;
     dispatch(setTheme((await import(`../../themes/${themeName}.ts`)).default));
@@ -156,7 +163,22 @@ function CommandLine() {
                   ? configList[selected].altOptions?.[index]
                   : option
                 }
-                <RiCheckLine />
+                {selectedValue === option && <RiCheckLine />}
+                {selected === 'themeName' && (config.favoriteThemes.includes(option as string) && (
+                  <span onClick={(e) => {
+                    e.stopPropagation();
+                    dispatch(removeFavoriteTheme(option as string));
+                  }}>
+                    <RiStarFill />
+                  </span>
+                ) || activeIndex === index && (
+                  <span onClick={(e) => {
+                    e.stopPropagation();
+                    dispatch(addFavoriteTheme(option as string));
+                  }}>
+                    <RiStarLine />
+                  </span>
+                ))}
               </Styled.Item>
             ))}
             {configList[selected].custom && (
