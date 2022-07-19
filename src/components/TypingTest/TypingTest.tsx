@@ -30,6 +30,8 @@ function TypingTest() {
     soundOnError,
     smoothCaret,
     caretStyle,
+    smoothLineScroll,
+    fontSize,
     flipTestColors,
     colorfulMode,
     outOfFocusWarning,
@@ -62,16 +64,13 @@ function TypingTest() {
   const currentLetter = useRef<HTMLSpanElement>(null);
   const blurTimeout = useRef<NodeJS.Timer>();
   const typingTimeout = useRef<NodeJS.Timer>();
-  const lastCaretTopPosition = useRef(0);
-  const generateTestWords = ({ words, characters }: { words?: number, characters: number; }) => {
+  const highestWordIndex = useRef(0);
+  const generateTestWords = (words: number) => {
     const newTestWords = [];
-    let totalCharacters = 0;
-    while (totalCharacters < characters) {
-      if (newTestWords.length === words) break;
+    while (newTestWords.length < words) {
       const randomIndex = Math.floor(Math.random() * testLanguage.words.length);
       const word = testLanguage.words[randomIndex];
-      newTestWords.push(testLanguage.words[randomIndex]);
-      totalCharacters += word.length;
+      newTestWords.push(word);
     }
     dispatch(addTestWords(newTestWords));
   };
@@ -110,10 +109,11 @@ function TypingTest() {
 
   useEffect(() => {
     dispatch(resetTest());
+    dispatch(setIsReady(true));
     if (mode === 'words' && words > 0) {
-      generateTestWords({ words, characters: 200 });
+      generateTestWords(Math.min(100, words));
     } else if (mode === 'time' || mode === 'words' && !words) {
-      generateTestWords({ characters: 200 });
+      generateTestWords(100);
     } else if (mode === 'zen') {
       dispatch(setIsReady(true));
     }
@@ -132,22 +132,23 @@ function TypingTest() {
   useEffect(() => {
     const top = currentWord.current?.offsetTop || 0;
     const left = currentLetter.current
-      ? currentLetter.current.offsetLeft + currentLetter.current.offsetWidth + 1
+      ? currentLetter.current.offsetLeft + currentLetter.current.offsetWidth
       : currentWord.current?.offsetLeft || 0;
-    currentWord.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    currentWord.current?.scrollIntoView({
+      behavior: smoothLineScroll === 'on' ? 'smooth' : 'auto',
+      block: 'center',
+    });
     setCaretPosition({ x: left, y: top });
-  }, [inputValue, wordIndex]);
+  }, [smoothLineScroll, fontSize, inputValue, wordIndex]);
   useEffect(() => {
-    if (caretPosition.y > lastCaretTopPosition.current) {
-      lastCaretTopPosition.current = caretPosition.y;
-      if (mode === 'words' && words > 0) {
-        generateTestWords({ words: words - testWords.length, characters: 80 });
-      } else if (mode === 'time' || mode === 'words' && !words) {
-        generateTestWords({ characters: 80 });
+    if (wordIndex > highestWordIndex.current) {
+      if (mode === 'time' || mode === 'words' && testWords.length < words) {
+        generateTestWords(1);
       }
+      highestWordIndex.current = wordIndex;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [testWords, caretPosition.y]);
+  }, [mode, words, testWords.length, wordIndex]);
   useEffect(() => {
     clickSound?.volume(soundVolume);
     errorSound?.volume(soundVolume);
@@ -169,7 +170,7 @@ function TypingTest() {
   );
 
   return (
-    <Styled.TypingTest>
+    <Styled.TypingTest $fontSize={fontSize}>
       <Styled.Input
         ref={input}
         value={inputValue}

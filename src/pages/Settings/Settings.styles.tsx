@@ -16,11 +16,12 @@ const Settings = styled(m.div).attrs(() => ({
 `;
 
 const Wrapper = styled.div`
+  height: 100%;
+  width: 100%;
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-rows: auto 1fr;
   position: absolute;
-  height: 100%;
   gap: 20px;
 
   >*:first-child {

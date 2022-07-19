@@ -25,7 +25,6 @@ const App = styled.div`
 const Content = styled.div`
   min-height: 100vh;
   width: 100%;
-  max-width: 1000px;
   padding: 32px;
   display: flex;
   flex-direction: column;

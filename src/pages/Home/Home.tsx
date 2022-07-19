@@ -25,6 +25,8 @@ function Home({ setRandomTheme }: Props) {
     time,
     words,
     language,
+    transitionSpeed,
+    keymap,
     keyTips,
   } = useAppSelector(({ config }) => config);
   const {
@@ -42,7 +44,7 @@ function Home({ setRandomTheme }: Props) {
     setRandomTheme();
     dispatch(setIsFinished(false));
     dispatch(setIsTyping(false));
-  }, 400, { trailing: false });
+  }, transitionSpeed * 2000, { trailing: false });
   const handleTab = (e: KeyboardEvent) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -101,7 +103,7 @@ function Home({ setRandomTheme }: Props) {
               </AnimatePresence>
               <TestStats />
               <TypingTest />
-              <Keymap />
+              {keymap !== 'off' && <Keymap />}
             </Styled.Wrapper>
         }
       </AnimatePresence>

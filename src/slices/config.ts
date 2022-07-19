@@ -15,7 +15,19 @@ const defaultConfig = {
   soundOnError: 'on',
   smoothCaret: 'on',
   caretStyle: 'default',
+  timerProgressStyle: 'both',
+  statsColor: 'main',
+  statsOpacity: 1,
+  smoothLineScroll: 'on',
+  showDecimalPlaces: 'off',
+  fontSize: 24,
   fontFamily: 'Lexend Deca',
+  pageWidth: '1250px',
+  transitionSpeed: 'normal',
+  keymap: 'react',
+  keymapLayout: 'qwerty',
+  keymapStyle: 'staggered',
+  keymapLegendStyle: 'blank',
   themeName: '',
   flipTestColors: 'off',
   colorfulMode: 'on',
@@ -85,8 +97,44 @@ const slice = createSlice({
     setCaretStyle: (state, action: PayloadAction<ApeTypes.Config['caretStyle']>) => {
       state.caretStyle = action.payload;
     },
+    setTimerProgressStyle: (state, action: PayloadAction<ApeTypes.Config['timerProgressStyle']>) => {
+      state.timerProgressStyle = action.payload;
+    },
+    setStatsColor: (state, action: PayloadAction<ApeTypes.Config['statsColor']>) => {
+      state.statsColor = action.payload;
+    },
+    setStatsOpacity: (state, action: PayloadAction<ApeTypes.Config['statsOpacity']>) => {
+      state.statsOpacity = action.payload;
+    },
+    setSmoothLineScroll: (state, action: PayloadAction<ApeTypes.Config['smoothLineScroll']>) => {
+      state.smoothLineScroll = action.payload;
+    },
+    setShowDecimalPlaces: (state, action: PayloadAction<ApeTypes.Config['showDecimalPlaces']>) => {
+      state.showDecimalPlaces = action.payload;
+    },
+    setFontSize: (state, action: PayloadAction<ApeTypes.Config['fontSize']>) => {
+      state.fontSize = action.payload;
+    },
     setFontFamily: (state, action: PayloadAction<ApeTypes.Config['fontFamily']>) => {
       state.fontFamily = action.payload;
+    },
+    setPageWidth: (state, action: PayloadAction<ApeTypes.Config['pageWidth']>) => {
+      state.pageWidth = action.payload;
+    },
+    setTransitionSpeed: (state, action: PayloadAction<ApeTypes.Config['transitionSpeed']>) => {
+      state.transitionSpeed = action.payload;
+    },
+    setKeymap: (state, action: PayloadAction<ApeTypes.Config['keymap']>) => {
+      state.keymap = action.payload;
+    },
+    setKeymapLayout: (state, action: PayloadAction<ApeTypes.Config['keymapLayout']>) => {
+      state.keymapLayout = action.payload;
+    },
+    setKeymapStyle: (state, action: PayloadAction<ApeTypes.Config['keymapStyle']>) => {
+      state.keymapStyle = action.payload;
+    },
+    setKeymapLegendStyle: (state, action: PayloadAction<ApeTypes.Config['keymapLegendStyle']>) => {
+      state.keymapLegendStyle = action.payload;
     },
     setThemeName: (state, action: PayloadAction<ApeTypes.Config['themeName']>) => {
       state.themeName = action.payload;
@@ -142,7 +190,19 @@ export const {
   setSoundOnError,
   setSmoothCaret,
   setCaretStyle,
+  setTimerProgressStyle,
+  setStatsColor,
+  setStatsOpacity,
+  setSmoothLineScroll,
+  setShowDecimalPlaces,
+  setFontSize,
   setFontFamily,
+  setPageWidth,
+  setTransitionSpeed,
+  setKeymap,
+  setKeymapLayout,
+  setKeymapStyle,
+  setKeymapLegendStyle,
   setThemeName,
   setFlipTestColors,
   setColorfulMode,

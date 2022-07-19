@@ -16,7 +16,15 @@ function App() {
   const dispatch = useAppDispatch();
   const { theme, commandLine } = useAppSelector(({ app }) => app);
   const config = useAppSelector(({ config }) => config);
-  const { language, fontFamily, themeName, randomTheme, favoriteThemes } = config;
+  const {
+    language,
+    fontFamily,
+    pageWidth,
+    transitionSpeed,
+    themeName,
+    randomTheme,
+    favoriteThemes,
+  } = config;
   const location = useLocation();
   const setRandomTheme = useCallback(async () => {
     if (randomTheme === 'off') return;
@@ -67,10 +75,10 @@ function App() {
   return (
     <ThemeProvider theme={{ ...theme, fontFamily }}>
       <LazyMotion features={domAnimation}>
-        <MotionConfig transition={{ opacity: { duration: 0.25 } }}>
+        <MotionConfig transition={{ opacity: { duration: transitionSpeed } }}>
           <GlobalStyle />
           <Styled.App>
-            <Styled.Content>
+            <Styled.Content style={{ maxWidth: pageWidth }}>
               <AnimatePresence>
                 {commandLine.isOpen && <CommandLine />}
               </AnimatePresence>

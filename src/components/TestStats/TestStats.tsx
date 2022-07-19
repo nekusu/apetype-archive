@@ -13,6 +13,9 @@ function TestStats() {
     mode,
     time,
     words,
+    timerProgressStyle,
+    statsColor,
+    statsOpacity,
     timerProgress,
     liveWpm,
     liveAccuracy,
@@ -72,16 +75,31 @@ function TestStats() {
     <Styled.Wrapper>
       <AnimatePresence>
         {(isRunning || isFinished) && (
-          <Styled.TestStats>
-            {timerProgress === 'show' && (mode === 'time'
-              ? <div>{absTimer}</div>
-              : mode === 'words' || mode === 'zen'
-                ? <div>
-                  {wordIndex}
-                  {mode !== 'zen' && words ? '/' + words : ''}
+          <Styled.TestStats $color={statsColor} $opacity={statsOpacity}>
+            {timerProgress === 'show' &&
+              (timerProgressStyle === 'text' || timerProgressStyle === 'both') && (
+                <div>
+                  {mode === 'time'
+                    ? absTimer
+                    : mode !== 'zen' && wordIndex + (words ? '/' + words : '')}
                 </div>
-                : null
-            )}
+              )}
+            {timerProgress === 'show' &&
+              (timerProgressStyle === 'bar' || timerProgressStyle === 'both') && (
+                <Styled.Bar
+                  initial={{ width: mode === 'time' ? '100%' : 0 }}
+                  animate={{
+                    width: mode === 'words' ? `${wordIndex / words * 100}%` : 0,
+                    transition: {
+                      width: {
+                        ease: mode === 'time' ? 'linear' : 'easeInOut',
+                        duration: mode === 'time' ? time : 0.25,
+                      },
+                    },
+                  }}
+                  $color={statsColor}
+                />
+              )}
             {liveWpm === 'show' && <div>{intWpm}</div>}
             {liveAccuracy === 'show' && <div>{intAccuracy}%</div>}
           </Styled.TestStats>

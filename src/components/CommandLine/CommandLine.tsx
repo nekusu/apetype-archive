@@ -159,10 +159,7 @@ function CommandLine() {
                 $active={index === activeIndex}
                 $selected={selectedValue === option}
               >
-                {configList[selected].showAltOptions
-                  ? configList[selected].altOptions?.[index]
-                  : option
-                }
+                {option}
                 {selectedValue === option && <RiCheckLine />}
                 {selected === 'themeName' && (config.favoriteThemes.includes(option as string) && (
                   <span onClick={(e) => {
@@ -190,7 +187,9 @@ function CommandLine() {
                 $selected={!configList[selected].options?.includes(selectedValue)}
               >
                 custom
-                <span>{selectedValue}</span>
+                {!configList[selected].options?.includes(selectedValue) && (
+                  <span>{selectedValue}</span>
+                )}
               </Styled.Item>
             )}
           </>

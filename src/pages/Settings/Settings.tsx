@@ -41,7 +41,8 @@ function Settings() {
                     name={name}
                     commandLine={commandLineNames.includes(name)}
                     buttonRows={name === 'soundOnClick' ? 2 :
-                      name === 'randomTheme' ? 1 : 0}
+                      name === 'randomTheme' || name === 'keymapStyle' || name === 'keymapLegendStyle'
+                        ? 1 : 0}
                   />
                 ))}
             </Styled.Group>
@@ -67,6 +68,7 @@ const commandLineNames = [
   'themeName',
   'language',
   'fontFamily',
+  'keymapLayout',
 ];
 
 export default Settings;

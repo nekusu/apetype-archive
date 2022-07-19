@@ -6,14 +6,15 @@ const TypingTest = styled(m.div).attrs(() => ({
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   exit: { opacity: 0 },
-}))`
-  min-height: 122px;
-  max-height: 122px;
+})) <{ $fontSize: ApeTypes.Config['fontSize']; }>`
+  height: ${p => (p.$fontSize * 16 + 6) * 4 + 8}px;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
+  font-size: ${p => p.$fontSize * 16}px;
+  line-height: ${p => p.$fontSize * 16}px;
   user-select: none;
 `;
 
@@ -35,6 +36,7 @@ const OutOfFocus = styled(m.div).attrs(() => ({
   align-items: center;
   justify-content: center;
   gap: 6px;
+  font-size: 16px;
   color: ${p => p.theme.text};
   pointer-events: none;
   transition-property: color;
@@ -64,11 +66,11 @@ const Wrapper = styled.div<{ $blurred: boolean; }>`
 `;
 
 const Caret = styled(m.div) <{ $style: string; }>`
-  height: ${p => p.$style === 'underline' ? 3 : 35}px;
-  width: ${p => p.$style === 'default' ? 3 : 17}px;
-  margin-top: ${p => p.$style === 'underline' ? 30 : 0}px;
+  height: ${p => p.$style === 'underline' ? '0.125em' : 'calc(1.2em + 6px)'};
+  width: ${p => p.$style === 'default' ? 0.125 : 0.7}em;
+  margin-top: ${p => p.$style === 'underline' ? 'calc(1em + 6px)' : 0};
   position: absolute;
-  border-radius: 2px;
+  border-radius: 0.1em;
   background-color: ${p => p.$style !== 'outline' ? p.theme.caret : 'transparent'};
   border: ${p => p.$style === 'outline' ? '2px solid ' + p.theme.caret : 'none'};
   transition-property: background-color, border-color;
@@ -82,14 +84,12 @@ const Words = styled(m.div).attrs(() => ({
   position: relative;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  line-height: 24px;
+  gap: 0.5em;
 `;
 
 const Word = styled.div<{ $error: boolean; }>`
   margin-block: 2px;
   display: flex;
-  font-size: 24px;
   border-bottom: 2px solid ${p => p.$error ? p.theme.colorfulError : 'transparent'};
   transition: border-color 0.1s ease-out;
 `;
@@ -129,7 +129,7 @@ const Typo = styled.span`
   justify-content: center;
   top: 90%;
   left: 0;
-  font-size: 18px;
+  font-size: 0.75em;
   color: ${p => p.theme.text};
   opacity: 0.5;
   transition: color 0.1s ease-out;

@@ -18,6 +18,7 @@ import Styled from './Chart.styles';
 
 function Chart() {
   const theme = useTheme();
+  const { showDecimalPlaces } = useAppSelector(({ config }) => config);
   const { stats, elapsedTime } = useAppSelector(({ typingTest }) => typingTest);
   const { raw, wpm, errorCount } = stats;
   const labels = Array(stats.raw.length).fill(0).map((_, i) => i + 1);
@@ -105,7 +106,7 @@ function Chart() {
         type: 'line' as const,
         label: 'raw',
         fill: true,
-        data: raw.map((r) => Math.floor(r)),
+        data: raw.map((r) => showDecimalPlaces === 'on' ? r.toFixed(2) : Math.floor(r)),
         borderColor: theme.sub,
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
         borderWidth: 2,
@@ -118,7 +119,7 @@ function Chart() {
         type: 'line' as const,
         label: 'wpm',
         fill: true,
-        data: wpm.map((w) => Math.floor(w)),
+        data: wpm.map((w) => showDecimalPlaces === 'on' ? w.toFixed(2) : Math.floor(w)),
         borderColor: theme.main,
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
         borderWidth: 2,

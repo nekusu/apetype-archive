@@ -6,10 +6,16 @@ import themes from '../themes/_list';
 interface ConfigItem {
   command: string;
   description?: string;
-  category?: string;
+  category?: 'behavior' |
+  'input' |
+  'sound' |
+  'caret' |
+  'appearance' |
+  'theme' |
+  'hide elements' |
+  'danger zone';
   options: (string | number)[];
   altOptions?: (string | number)[];
-  showAltOptions?: boolean;
   custom?: boolean;
   action: (arg: any) => any;
 }
@@ -85,7 +91,6 @@ const config: { [index: string]: ConfigItem; } = {
     category: 'sound',
     options: [0.2, 0.6, 1],
     altOptions: ['quiet', 'medium', 'loud'],
-    showAltOptions: true,
     action: actions.setSoundVolume,
   },
   soundOnClick: {
@@ -117,6 +122,48 @@ const config: { [index: string]: ConfigItem; } = {
     altOptions: ['off', '|', '▮', '▯', '_'],
     action: actions.setCaretStyle,
   },
+  timerProgressStyle: {
+    command: 'timer/progress style',
+    description: 'Change the style of the timer/progress during a timed test.',
+    category: 'appearance',
+    options: ['text', 'bar', 'both'],
+    action: actions.setTimerProgressStyle,
+  },
+  statsColor: {
+    command: 'stats color',
+    description: 'Change the color of the timer/progress, live wpm, and accuracy stats.',
+    category: 'appearance',
+    options: ['sub', 'text', 'main'],
+    action: actions.setStatsColor,
+  },
+  statsOpacity: {
+    command: 'stats opacity',
+    description: 'Change the opacity of the timer/progress, live wpm, and accuracy stats.',
+    category: 'appearance',
+    options: [0.25, 0.5, 0.75, 1],
+    action: actions.setStatsOpacity,
+  },
+  smoothLineScroll: {
+    command: 'smooth line scroll',
+    description: 'When enabled, the line transition will be animated.',
+    category: 'appearance',
+    options: ['off', 'on'],
+    action: actions.setSmoothLineScroll,
+  },
+  showDecimalPlaces: {
+    command: 'show decimal places',
+    description: 'Always shows decimal places for values on the result page.',
+    category: 'appearance',
+    options: ['off', 'on'],
+    action: actions.setShowDecimalPlaces,
+  },
+  fontSize: {
+    command: 'font size',
+    description: 'Change the font size of the test words.',
+    category: 'appearance',
+    options: [1, 1.25, 1.5, 2, 3, 4],
+    action: actions.setFontSize,
+  },
   fontFamily: {
     command: 'font family',
     description: 'Change the font family used troughout the website. If set to custom,\
@@ -139,6 +186,51 @@ const config: { [index: string]: ConfigItem; } = {
     ],
     custom: true,
     action: actions.setFontFamily,
+  },
+  pageWidth: {
+    command: 'page width',
+    description: 'Change the width of the content.',
+    category: 'appearance',
+    options: ['1000px', '1250px', '1500px', '2000px', '100%'],
+    altOptions: ['100%', '125%', '150%', '200%', 'max'],
+    action: actions.setPageWidth,
+  },
+  transitionSpeed: {
+    command: 'transition speed',
+    description: 'Change the speed of the transitions.',
+    category: 'appearance',
+    options: [0.1, 0.25, 0.4],
+    altOptions: ['fast', 'normal', 'slow'],
+    action: actions.setTransitionSpeed,
+  },
+  keymap: {
+    command: 'keymap',
+    description: 'Displays your current layout while taking a test. React shows what you\
+      pressed and Next shows what you need to press next.',
+    category: 'appearance',
+    options: ['off', 'static', 'react', 'next'],
+    action: actions.setKeymap,
+  },
+  keymapLayout: {
+    command: 'keymap layout',
+    description: 'Controls which layout is displayed on the keymap.',
+    category: 'appearance',
+    options: ['qwerty', 'dvorak', 'colemak', 'workman'],
+    action: actions.setKeymapLayout,
+  },
+  keymapStyle: {
+    command: 'keymap style',
+    description: 'Change the style of the keymap.',
+    category: 'appearance',
+    options: ['staggered', 'matrix', 'split', 'split matrix'],
+    action: actions.setKeymapStyle,
+  },
+  keymapLegendStyle: {
+    command: 'keymap legend style',
+    description: 'Change the style of the keymap legend.',
+    category: 'appearance',
+    options: ['blank', 'lowercase', 'uppercase', 'dynamic'],
+    action: actions.setKeymapLegendStyle,
   },
   themeName: {
     command: 'theme',

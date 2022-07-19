@@ -5,7 +5,13 @@ import { accuracy as acc, kogasa } from '../../utils';
 import Styled from './TestResults.styles';
 
 function TestResults() {
-  const { mode, time, words, language } = useAppSelector(({ config }) => config);
+  const {
+    mode,
+    time,
+    words,
+    language,
+    showDecimalPlaces,
+  } = useAppSelector(({ config }) => config);
   const {
     testWords,
     raw,
@@ -45,11 +51,17 @@ function TestResults() {
       <Styled.Stats>
         <StatGroup
           title={{ text: 'wpm', size: 32 }}
-          values={[{ text: intWpm, size: 64 }]}
+          values={[{
+            text: `${showDecimalPlaces === 'on' ? +wpm.toFixed(2) : intWpm}`,
+            size: 64,
+          }]}
         />
         <StatGroup
           title={{ text: 'acc', size: 32 }}
-          values={[{ text: `${intAccuracy}%`, size: 64 }]}
+          values={[{
+            text: `${showDecimalPlaces === 'on' ? +accuracy.toFixed(2) : intAccuracy}%`,
+            size: 64,
+          }]}
         />
       </Styled.Stats>
       <Styled.Wrapper>
@@ -65,7 +77,10 @@ function TestResults() {
         />
         <StatGroup
           title={{ text: 'raw' }}
-          values={[{ text: intRaw, size: 32 }]}
+          values={[{
+            text: `${showDecimalPlaces === 'on' ? +raw.toFixed(2) : intRaw}`,
+            size: 32,
+          }]}
         />
         <StatGroup
           title={{ text: 'characters' }}
@@ -73,7 +88,10 @@ function TestResults() {
         />
         <StatGroup
           title={{ text: 'consistency' }}
-          values={[{ text: `${intConsistency}%`, size: 32 }]}
+          values={[{
+            text: `${showDecimalPlaces === 'on' ? +consistency.toFixed(2) : intConsistency}%`,
+            size: 32,
+          }]}
         />
         <StatGroup
           title={{ text: 'time' }}
