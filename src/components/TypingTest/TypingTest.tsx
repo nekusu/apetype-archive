@@ -23,6 +23,7 @@ function TypingTest() {
   const {
     mode,
     words,
+    blindMode,
     indicateTypos,
     hideExtraLetters,
     soundVolume,
@@ -87,7 +88,7 @@ function TypingTest() {
     setIsFocused(false);
   };
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Tab' || e.key === 'Escape' || e.key.match(/F\d*/)) return;
+    if (['Tab', 'Escape', 'Enter'].includes(e.key) || e.key.match(/F\d*/)) return;
     e.preventDefault();
     focusWords();
   };
@@ -154,10 +155,10 @@ function TypingTest() {
     errorSound?.volume(soundVolume);
   }, [soundVolume, clickSound, errorSound]);
   useEffect(() => {
-    if (soundOnError === 'on' && isRunning && errorCount > 0) {
+    if (soundOnError === 'on' && blindMode === 'off' && isRunning && errorCount > 0) {
       playErrorSound();
     }
-  }, [soundOnError, errorCount, isRunning, playErrorSound]);
+  }, [blindMode, soundOnError, errorCount, isRunning, playErrorSound]);
   useEventListener(
     !commandLine.isOpen && !isTestPopupOpen && !isFocused ? window : null,
     'keydown',
@@ -209,7 +210,7 @@ function TypingTest() {
                 <Styled.Word
                   ref={wordIndex === index ? currentWord : null}
                   key={`${original}-${index}`}
-                  $error={wordIndex > index && !isCorrect}
+                  $error={blindMode === 'off' && wordIndex > index && !isCorrect}
                 >
                   {letters.map((letter, i) => (
                     <Styled.Letter
@@ -218,10 +219,14 @@ function TypingTest() {
                       key={i}
                       $flipColors={flipTestColors === 'on'}
                       $colorful={colorfulMode === 'on'}
-                      $status={letter.status}
-                      $hidden={hideExtraLetters === 'on' && letter.status === 'extra'}
+                      $status={blindMode === 'on' &&
+                        (letter.status === 'incorrect' || letter.status === 'missed')
+                        ? 'correct' : letter.status}
+                      $hidden={(hideExtraLetters === 'on' || blindMode === 'on')
+                        && letter.status === 'extra'}
                     >
-                      {indicateTypos === 'replace' && letter.typed || letter.original}
+                      {blindMode === 'off' && indicateTypos === 'replace'
+                        ? letter.typed || letter.original : letter.original}
                       {indicateTypos === 'below' && letter.status === 'incorrect' && (
                         <Styled.Typo>{letter.typed}</Styled.Typo>
                       )}

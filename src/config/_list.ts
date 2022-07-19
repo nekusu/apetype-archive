@@ -38,6 +38,23 @@ const config: { [index: string]: ConfigItem; } = {
     custom: true,
     action: actions.setWords,
   },
+  quickRestart: {
+    command: 'quick restart',
+    description: 'Press tab or esc to quickly restart the test, or to quickly jump to the test\
+      page. Both options disable tab navigation on most parts of the website. Using the "esc"\
+      option will move opening the command line to the tab key.',
+    category: 'behavior',
+    options: ['off', 'tab', 'esc'],
+    action: actions.setQuickRestart,
+  },
+  blindMode: {
+    command: 'blind mode',
+    description: 'No errors or incorrect words are highlighted. Helps you to focus on raw speed.\
+      If enabled, quick end is recommended.',
+    category: 'behavior',
+    options: ['off', 'on'],
+    action: actions.setBlindMode,
+  },
   language: {
     command: 'language',
     description: 'Change in which language you want to type.',

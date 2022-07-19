@@ -4,6 +4,8 @@ const defaultConfig = {
   mode: 'time',
   time: 15,
   words: 10,
+  quickRestart: 'tab',
+  blindMode: 'off',
   language: 'english',
   freedomMode: 'off',
   confidenceMode: 'off',
@@ -63,6 +65,12 @@ const slice = createSlice({
       if (!isNaN(words) && words < 5000) {
         state.words = words;
       }
+    },
+    setQuickRestart: (state, action: PayloadAction<ApeTypes.Config['quickRestart']>) => {
+      state.quickRestart = action.payload;
+    },
+    setBlindMode: (state, action: PayloadAction<ApeTypes.Config['blindMode']>) => {
+      state.blindMode = action.payload;
     },
     setLanguage: (state, action: PayloadAction<ApeTypes.Config['language']>) => {
       state.language = action.payload;
@@ -179,6 +187,8 @@ export const {
   setMode,
   setTime,
   setWords,
+  setQuickRestart,
+  setBlindMode,
   setLanguage,
   setFreedomMode,
   setConfidenceMode,

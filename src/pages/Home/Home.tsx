@@ -4,7 +4,7 @@ import { formatDuration } from 'date-fns';
 import useEventListener from 'use-typed-event-listener';
 import { useThrottledCallback } from 'use-debounce';
 import uniqid from 'uniqid';
-import { RiArrowRightSLine, RiTerminalLine, RiGlobeFill } from 'react-icons/ri';
+import { RiArrowRightSLine, RiTerminalLine, RiGlobeFill, RiRestartLine } from 'react-icons/ri';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Keymap, TestResults, TestStats, TypingTest } from '../../components';
 import { Button, Input, Key, Loading, Popup } from '../../components/ui';
@@ -24,6 +24,7 @@ function Home({ setRandomTheme }: Props) {
     mode,
     time,
     words,
+    quickRestart,
     language,
     transitionSpeed,
     keymap,
@@ -45,8 +46,9 @@ function Home({ setRandomTheme }: Props) {
     dispatch(setIsFinished(false));
     dispatch(setIsTyping(false));
   }, transitionSpeed * 2000, { trailing: false });
-  const handleTab = (e: KeyboardEvent) => {
-    if (e.key === 'Tab') {
+  const handleRestartKey = (e: KeyboardEvent) => {
+    if (quickRestart === 'off') return;
+    if (e.key === (quickRestart !== 'esc' ? 'Tab' : 'Escape')) {
       e.preventDefault();
       restartTest();
     }
@@ -64,7 +66,7 @@ function Home({ setRandomTheme }: Props) {
   useEventListener(
     !commandLine.isOpen && !isTestPopupOpen ? window : null,
     'keydown',
-    handleTab,
+    handleRestartKey,
   );
   useEffect(() => {
     setCustomAmount(mode === 'time' ? time : words);
@@ -104,6 +106,13 @@ function Home({ setRandomTheme }: Props) {
               <TestStats />
               <TypingTest />
               {keymap !== 'off' && <Keymap />}
+              {quickRestart === 'off' && (
+                <Styled.Buttons>
+                  <Button alt title="Restart test" onClick={restartTest}>
+                    <RiRestartLine />
+                  </Button>
+                </Styled.Buttons>
+              )}
             </Styled.Wrapper>
         }
       </AnimatePresence>
@@ -138,8 +147,11 @@ function Home({ setRandomTheme }: Props) {
                 {(mode === 'zen' || mode === 'words' && !words || mode === 'time' && !time) && (
                   <div><Key>shift</Key> + <Key>enter</Key> - stop test</div>
                 )}
-                <div><Key>tab</Key> - restart test</div>
-                <div><Key>esc</Key> - command line</div>
+                <div>
+                  <Key>{quickRestart !== 'esc' ? 'tab' : 'esc'}</Key>
+                  {quickRestart === 'off' ? <> + <Key>enter</Key></> : null} - restart test
+                </div>
+                <div><Key>{quickRestart !== 'esc' ? 'esc' : 'tab'}</Key> - command line</div>
               </Styled.Tips>
             )}
             <Styled.CommandLineButton

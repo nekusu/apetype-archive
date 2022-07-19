@@ -15,7 +15,7 @@ const Button = styled.button<{ $active?: boolean; }>`
   cursor: pointer;
   transition: background 0.2s, color 0.2s, transform 0.15s;
 
-  &:hover {
+  &:hover, &:focus {
     background: ${p => p.theme.text};
     color: ${p => p.theme.bg};
   }
@@ -30,7 +30,7 @@ const TextButton = styled(Button) <{ $active?: boolean; }>`
   }
   color: ${p => p.$active ? p.theme.main : p.theme.sub};
 
-  &:hover {
+  &:hover, &:focus {
     color: ${p => p.theme.text};
   }
   &:active {
@@ -39,9 +39,10 @@ const TextButton = styled(Button) <{ $active?: boolean; }>`
 `;
 
 const AltButton = styled(TextButton)`
-  &:active {
+  &:active, &:focus {
     background: ${p => p.theme.text};
     color: ${p => p.theme.bg};
+    transform: scale(0.925);
   }
 `;
 

@@ -17,6 +17,7 @@ function App() {
   const { theme, commandLine } = useAppSelector(({ app }) => app);
   const config = useAppSelector(({ config }) => config);
   const {
+    quickRestart,
     language,
     fontFamily,
     pageWidth,
@@ -40,7 +41,7 @@ function App() {
     }
   }, [dispatch, randomTheme, themeName, favoriteThemes]);
   const toggleCommandLine = (e: KeyboardEvent) => {
-    if (e.key !== 'Escape') return;
+    if (e.key !== (quickRestart !== 'esc' ? 'Escape' : 'Tab')) return;
     e.preventDefault();
     dispatch(setCommandLine({ isOpen: !commandLine.isOpen }));
     dispatch(setIsTestPopupOpen(false));

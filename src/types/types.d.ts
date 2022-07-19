@@ -3,6 +3,8 @@ declare namespace ApeTypes {
     mode: 'time' | 'words' | 'zen';
     time: number;
     words: number;
+    quickRestart: 'off' | 'tab' | 'esc';
+    blindMode: 'off' | 'on';
     language: string;
     freedomMode: 'off' | 'on';
     confidenceMode: 'off' | 'on' | 'max';

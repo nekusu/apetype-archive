@@ -59,7 +59,6 @@ const TestButtons = styled(m.div).attrs(() => ({
 `;
 
 const Buttons = styled.div`
-  margin-top: 20px;
   display: flex;
   justify-content: center;
   gap: 16px;

@@ -6,7 +6,7 @@ import configList from '../../config/_list';
 import Styled from './Settings.styles';
 
 function Settings() {
-  const { keyTips } = useAppSelector(({ config }) => config);
+  const { quickRestart, keyTips } = useAppSelector(({ config }) => config);
   const list = useRef<HTMLDivElement>(null);
   const scrollToCategory = (index: number) => {
     list.current?.children[index].scrollIntoView({
@@ -20,7 +20,8 @@ function Settings() {
       <Styled.Wrapper>
         <div style={{ display: keyTips === 'show' ? 'block' : 'none' }}>
           pro tip: you can also change all these
-          settings quickly using the command line (<Key>esc</Key>)
+          settings quickly using the command line
+          (<Key>{quickRestart !== 'esc' ? 'esc' : 'tab'}</Key>)
         </div>
         <Styled.NavButtons>
           {categories.map((cat, index) => (
